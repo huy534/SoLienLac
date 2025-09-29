@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_search"
+        android:title="Tìm kiếm"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
+
+    <item
+        android:id="@+id/action_sort"
+        android:title="Sắp xếp"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/action_sort_avg" android:title="Theo điểm TB giảm dần"/>
+            <item android:id="@+id/action_sort_roll" android:title="Theo số báo danh tăng dần"/>
+            <item android:id="@+id/action_sort_name" android:title="Theo tên A→Z"/>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/action_export_pdf"
+        android:title="Xuất PDF"
+        android:icon="@android:drawable/ic_menu_save"
+        app:showAsAction="never"/>
+
+</menu>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="12dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Tên lớp">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etTenLop" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <EditText
+            android:id="@+id/etNamHoc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Năm học (vd: 2024-2025)"
+            android:inputType="text" />
+        <com.google.android.material.textfield.TextInputLayout android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Khối">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etKhoi" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Sĩ số">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etSiSo" android:inputType="number" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="GVCN (userId)">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etGvcn" android:inputType="number" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+</ScrollView>

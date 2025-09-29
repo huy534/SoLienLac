@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText android:id="@+id/etName" android:hint="Họ tên"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+        <EditText android:id="@+id/etDob" android:hint="Ngày sinh"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"/>
+
+        <EditText android:id="@+id/etGioiTinh" android:hint="Giới tính"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"/>
+
+        <EditText android:id="@+id/etQueQuan" android:hint="Quê quán"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"/>
+
+        <EditText android:id="@+id/etMaLop" android:hint="Mã lớp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"/>
+
+        <Button android:id="@+id/btnSave" android:text="Lưu"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SchoolApp</string>
+
+    <!-- Login -->
+    <string name="login_title">Đăng nhập</string>
+    <string name="username">Tên đăng nhập</string>
+    <string name="password">Mật khẩu</string>
+    <string name="btn_login">Đăng nhập</string>
+
+    <!-- Main -->
+    <string name="main_title">Trang chính</string>
+    <string name="btn_students">Quản lý sinh viên</string>
+
+    <!-- Students -->
+    <string name="students_title">Danh sách sinh viên</string>
+    <string name="add_student">Thêm sinh viên</string>
+    <string name="edit_student">Sửa sinh viên</string>
+    <string name="delete_student">Xóa sinh viên</string>
+    <string name="empty_list">Chưa có sinh viên</string>
+
+    <!-- Add/Edit -->
+    <string name="name">Họ và tên</string>
+    <string name="phone">Số điện thoại</string>
+    <string name="roll">Số báo danh</string>
+    <string name="avg">Điểm trung bình</string>
+    <string name="save">Lưu</string>
+</resources>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llMonDetailRoot"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarMonDetail"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:title="Chi tiết môn"
+        android:titleTextColor="@android:color/white" />
+
+    <LinearLayout
+        android:id="@+id/llHeader"
+        android:orientation="vertical"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvDetailMonId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mã môn: 1"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvDetailMonTen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên môn: Toán"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvDetailMonSoTiet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số tiết: 4"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvDetailMonGV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GV: gvtoan"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0" />
+
+    <TextView
+        android:id="@+id/tvStudentsHeader"
+        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Danh sách học sinh"
+        android:textStyle="bold"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerStudentsInMon"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+</LinearLayout>

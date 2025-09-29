@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="spDiemDanh" type="id" />
+    <item name="tvHoTen" type="id" />
+    <item name="tvNgaySinh" type="id" />
+    <item name="tvGioiTinh" type="id" />
+    <item name="tvQueQuan" type="id" />
+    <item name="tvMaLop" type="id" />
+</resources>

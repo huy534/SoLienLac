@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Điểm hệ số 1" />
+
+        <EditText
+            android:id="@+id/etHS1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="Điểm hệ số 1" />
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Điểm hệ số 2" />
+
+        <EditText
+            android:id="@+id/etHS2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="Điểm hệ số 2" />
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Điểm thi học kỳ" />
+
+        <EditText
+            android:id="@+id/etThi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="Điểm thi" />
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nhận xét" />
+
+        <EditText
+            android:id="@+id/etNhanXet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhận xét giáo viên" />
+
+        <TextView
+            android:layout_marginTop="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Điểm danh (hôm nay)" />
+
+        <RadioGroup
+            android:id="@+id/rgAttendance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rbPresent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Có mặt" />
+
+            <RadioButton
+                android:id="@+id/rbAbsentPermit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vắng có phép" />
+
+            <RadioButton
+                android:id="@+id/rbAbsentNoPermit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vắng không phép" />
+
+            <RadioButton
+                android:id="@+id/rbLate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Muộn" />
+        </RadioGroup>
+
+    </LinearLayout>
+</ScrollView>

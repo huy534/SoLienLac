@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollDialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Student name (readable) -->
+        <TextView
+            android:id="@+id/tvStudentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tên HS"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+
+        <!-- Subject name (readable) -->
+        <TextView
+            android:id="@+id/tvSubjectName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Môn học"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Mã HS (editable for add) -->
+        <EditText
+            android:id="@+id/etHocSinhId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mã học sinh (ID)"
+            android:inputType="number"/>
+
+        <!-- Mã Môn (editable for add) -->
+        <EditText
+            android:id="@+id/etMonId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mã môn (ID)"
+            android:inputType="number"
+            android:layout_marginTop="8dp"/>
+
+        <EditText
+            android:id="@+id/etDiemHS1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Điểm hệ số 1"
+            android:inputType="numberDecimal"
+            android:layout_marginTop="8dp"/>
+
+        <EditText
+            android:id="@+id/etDiemHS2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Điểm hệ số 2"
+            android:inputType="numberDecimal"
+            android:layout_marginTop="8dp"/>
+
+        <EditText
+            android:id="@+id/etDiemThi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Điểm thi học kỳ"
+            android:inputType="numberDecimal"
+            android:layout_marginTop="8dp"/>
+
+        <EditText
+            android:id="@+id/etNhanXet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhận xét"
+            android:inputType="text"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Điểm danh"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"/>
+
+        <Spinner
+            android:id="@+id/spDiemDanh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"/>
+    </LinearLayout>
+</ScrollView>
