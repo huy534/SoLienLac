@@ -15,13 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * DiemAdapter - hiển thị tên học sinh, tên môn, điểm TB và nhận xét.
- * Hỗ trợ filter và click / long-click.
- */
+
 public class DiemAdapter extends RecyclerView.Adapter<DiemAdapter.VH> {
-    private List<Diem> items;           // hiển thị hiện tại
-    private final List<Diem> originals; // dữ liệu gốc (dùng cho filter)
+    private List<Diem> items;           
+    private final List<Diem> originals; 
 
     private OnItemClickListener<Diem> clickListener;
     private OnItemLongClickListener<Diem> longClickListener;
@@ -60,19 +57,16 @@ public class DiemAdapter extends RecyclerView.Adapter<DiemAdapter.VH> {
         }
         holder.tvTenHocSinh.setText(tenHS);
 
-        // Ten mon (fallback to mon id)
         String tenMon = d.getTenMon();
         if (tenMon == null || tenMon.trim().isEmpty()) {
             tenMon = "Môn ID: " + d.getMonId();
         }
         holder.tvTenMon.setText("Môn: " + tenMon);
-
-        // Diem TB (format 2 decimals)
         float tb = d.getDiemTB();
         String tbText = String.format(Locale.getDefault(), "TB: %.2f", tb);
         holder.tvDiemTB.setText(tbText);
 
-        // Note / nhan xet
+        
         String note = d.getNhanXet();
         if (note == null || note.trim().isEmpty()) {
             holder.tvNote.setVisibility(View.GONE);
@@ -80,8 +74,6 @@ public class DiemAdapter extends RecyclerView.Adapter<DiemAdapter.VH> {
             holder.tvNote.setVisibility(View.VISIBLE);
             holder.tvNote.setText("Nhận xét: " + note);
         }
-
-        // Click / long-click
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) clickListener.onItemClick(d);
         });
