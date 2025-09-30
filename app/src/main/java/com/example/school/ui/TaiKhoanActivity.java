@@ -36,7 +36,7 @@ public class TaiKhoanActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         Toolbar toolbar = findViewById(R.id.toolbarTK);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar()!=null) { getSupportActionBar().setDisplayHomeAsUpEnabled(true); getSupportActionBar().setTitle("THồ sơ cá nhân"); }
+        if (getSupportActionBar()!=null) { getSupportActionBar().setDisplayHomeAsUpEnabled(true); getSupportActionBar().setTitle("Hồ sơ cá nhân"); }
         toolbar.setNavigationOnClickListener(v -> finish());
 
         // Load user info từ DB
@@ -74,13 +74,20 @@ public class TaiKhoanActivity extends AppCompatActivity {
                     String newPass = etNew.getText().toString();
                     String confirmPass = etConfirm.getText().toString();
 
-                    if (!newPass.equals(confirmPass)) {
-                        Toast.makeText(this, "Mật khẩu xác nhận không khớp", Toast.LENGTH_SHORT).show();
+                    if (oldPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
+                        Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
-                    boolean success = db.changePassword(userId, oldPass, newPass);
-                    Toast.makeText(this, success ? "Đổi mật khẩu thành công" : "Sai mật khẩu cũ", Toast.LENGTH_SHORT).show();
+                    if (!newPass.equals(confirmPass)) {
+                        Toast.makeText(this, "Xác nhận mật khẩu không khớp", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    boolean ok = db.changePassword(session.getUserId(), oldPass, newPass);
+                    if (ok) {
+                        Toast.makeText(this, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Sai mật khẩu cũ", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .setNegativeButton("Đóng", null)
                 .show();

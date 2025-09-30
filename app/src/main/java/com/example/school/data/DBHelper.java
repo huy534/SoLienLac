@@ -10,6 +10,8 @@ import android.util.Log;
 import com.example.school.auth.HashUtils;
 import com.example.school.model.*;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -143,6 +145,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return id;
     }
+
     private void seedData(SQLiteDatabase db) {
         // ---------- USERS ----------
         safeInsertUser(db, "admin", "123", "admin", "admin@school.com", "0900000001");
@@ -169,13 +172,13 @@ public class DBHelper extends SQLiteOpenHelper {
         int idGvDia = getUserIdByUsername(db, "gvdia");
 
         // ---------- LOP HOC ----------
-        String[] tenLop = {"10A1","10A2","10A3","10A4","11A1","11A2","11A3","12A1","12A2","12A3"};
+        String[] tenLop = {"10A1", "10A2", "10A3", "10A4", "11A1", "11A2", "11A3", "12A1", "12A2", "12A3"};
         int[] gvcnArr = {idGvToan, idGvVan, idGvAnh, idGvLy, idGvHoa, idGvSinh, idGvTin, idGvLs, idGvDia, idGvToan};
 
         for (int i = 0; i < tenLop.length; i++) {
             if (!exists(db, "LopHoc", "tenLop=?", new String[]{tenLop[i]})) {
                 db.execSQL("INSERT INTO LopHoc (tenLop,khoi,namHoc,siSo,gvcn) VALUES (?,?,?,?,?)",
-                        new Object[]{tenLop[i], tenLop[i].substring(0,2), "2024-2025", 30, gvcnArr[i]});
+                        new Object[]{tenLop[i], tenLop[i].substring(0, 2), "2024-2025", 30, gvcnArr[i]});
             }
         }
 
@@ -228,12 +231,24 @@ public class DBHelper extends SQLiteOpenHelper {
                     for (int tiet = 1; tiet <= 3; tiet++) {
                         int maMon;
                         switch ((lopId + thu + tiet) % 6) {
-                            case 0: maMon = idToan; break;
-                            case 1: maMon = idVan; break;
-                            case 2: maMon = idAnh; break;
-                            case 3: maMon = idLy; break;
-                            case 4: maMon = idHoa; break;
-                            default: maMon = idSinh; break;
+                            case 0:
+                                maMon = idToan;
+                                break;
+                            case 1:
+                                maMon = idVan;
+                                break;
+                            case 2:
+                                maMon = idAnh;
+                                break;
+                            case 3:
+                                maMon = idLy;
+                                break;
+                            case 4:
+                                maMon = idHoa;
+                                break;
+                            default:
+                                maMon = idSinh;
+                                break;
                         }
                         db.execSQL("INSERT INTO TKB (maLop, maMon, thu, tiet) VALUES (?,?,?,?)",
                                 new Object[]{lopId, maMon, thu, tiet});
@@ -261,7 +276,8 @@ public class DBHelper extends SQLiteOpenHelper {
         // ---------- DIEM (50 bản ghi ngẫu nhiên) ----------
         Random rnd = new Random();
         int inserted = 0;
-        outer: for (int hsId = 1; hsId <= 27; hsId++) {
+        outer:
+        for (int hsId = 1; hsId <= 27; hsId++) {
             for (int monId = 1; monId <= 6; monId++) {
                 if (inserted >= 50) break outer;
                 if (!exists(db, "Diem", "hocSinhId=? AND monId=?", new String[]{String.valueOf(hsId), String.valueOf(monId)})) {
@@ -287,6 +303,7 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
     }
+
     public int getLopIdByGVCN(int gvId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT id FROM LopHoc WHERE gvcn=? LIMIT 1", new String[]{String.valueOf(gvId)});
@@ -315,6 +332,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
+
     // ----------------- AUTH -----------------
     public NguoiDung login(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -336,6 +354,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return u;
     }
+
     public boolean registerUser(String username, String password, String role, String email, String phone) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -347,6 +366,7 @@ public class DBHelper extends SQLiteOpenHelper {
         long result = db.insert("NguoiDung", null, cv);
         return result != -1;
     }
+
     public List<NguoiDung> getAllUsers() {
         List<NguoiDung> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -553,6 +573,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
+
     // ---------------- HOC SINH ----------------
     public List<HocSinh> getAllHocSinh() {
         List<HocSinh> list = new ArrayList<>();
@@ -560,7 +581,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("SELECT * FROM HocSinh", null);
         if (c.moveToFirst()) {
             do {
-                HocSinh hs = new HocSinh(0,null,null,null,null,1);
+                HocSinh hs = new HocSinh(0, null, null, null, null, 1);
                 hs.setId(c.getInt(c.getColumnIndexOrThrow("id")));
                 hs.setHoTen(c.getString(c.getColumnIndexOrThrow("hoTen")));
                 hs.setNgaySinh(c.getString(c.getColumnIndexOrThrow("ngaySinh")));
@@ -603,7 +624,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // ----------------- Diem (upsert, get) -----------------
     private static float computeTB(float hs1, float hs2, float thi) {
-        return (float)((hs1 + 2.0*hs2 + 3.0*thi) / 6.0);
+        return (float) ((hs1 + 2.0 * hs2 + 3.0 * thi) / 6.0);
     }
 
     public long upsertDiem(int hocSinhId, int monId, float hs1, float hs2, float thi, String nhanXet) {
@@ -826,6 +847,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // ----------------- TKB -----------------
+
     /**
      * Insert TKB entry
      */
@@ -888,9 +910,18 @@ public class DBHelper extends SQLiteOpenHelper {
                 t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
                 t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
                 // optional display fields
-                try { t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon"))); } catch (Exception ignored) {}
-                try { t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop"))); } catch (Exception ignored) {}
-                try { t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv"))); } catch (Exception ignored) {}
+                try {
+                    t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
+                } catch (Exception ignored) {
+                }
+                try {
+                    t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
+                } catch (Exception ignored) {
+                }
+                try {
+                    t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv")));
+                } catch (Exception ignored) {
+                }
                 list.add(t);
             }
             c.close();
@@ -921,8 +952,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
                 t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
                 t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
-                try { t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon"))); } catch (Exception ignored) {}
-                try { t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop"))); } catch (Exception ignored) {}
+                try {
+                    t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
+                } catch (Exception ignored) {
+                }
+                try {
+                    t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
+                } catch (Exception ignored) {
+                }
                 list.add(t);
             }
             c.close();
@@ -944,7 +981,10 @@ public class DBHelper extends SQLiteOpenHelper {
             if (c1.moveToFirst()) maLop = c1.getInt(0);
             c1.close();
         }
-        if (maLop <= 0) { rdb.close(); return list; }
+        if (maLop <= 0) {
+            rdb.close();
+            return list;
+        }
 
         String sql = "SELECT t.id, t.maLop, t.maMon, t.thu, t.tiet, m.tenMon as tenMon, l.tenLop as tenLop " +
                 "FROM TKB t " +
@@ -961,8 +1001,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
                 t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
                 t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
-                try { t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon"))); } catch (Exception ignored) {}
-                try { t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop"))); } catch (Exception ignored) {}
+                try {
+                    t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
+                } catch (Exception ignored) {
+                }
+                try {
+                    t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
+                } catch (Exception ignored) {
+                }
                 list.add(t);
             }
             c.close();
@@ -992,9 +1038,18 @@ public class DBHelper extends SQLiteOpenHelper {
                 t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
                 t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
                 t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
-                try { t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon"))); } catch (Exception ignored) {}
-                try { t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop"))); } catch (Exception ignored) {}
-                try { t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv"))); } catch (Exception ignored) {}
+                try {
+                    t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
+                } catch (Exception ignored) {
+                }
+                try {
+                    t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
+                } catch (Exception ignored) {
+                }
+                try {
+                    t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv")));
+                } catch (Exception ignored) {
+                }
                 list.add(t);
             }
             c.close();
@@ -1009,15 +1064,22 @@ public class DBHelper extends SQLiteOpenHelper {
         String s = "";
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT tenLop FROM LopHoc WHERE id=?", new String[]{String.valueOf(id)});
-        if (c != null && c.moveToFirst()) { s = c.getString(0); c.close(); }
+        if (c != null && c.moveToFirst()) {
+            s = c.getString(0);
+            c.close();
+        }
         db.close();
         return s;
     }
+
     public String getMonNameById(int id) {
         String s = "";
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT tenMon FROM MonHoc WHERE id=?", new String[]{String.valueOf(id)});
-        if (c != null && c.moveToFirst()) { s = c.getString(0); c.close(); }
+        if (c != null && c.moveToFirst()) {
+            s = c.getString(0);
+            c.close();
+        }
         db.close();
         return s;
     }
@@ -1115,6 +1177,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
+
     // Lấy học sinh theo giáo viên chủ nhiệm
     public List<HocSinh> getHocSinhByTeacher(int teacherUserId) {
         List<HocSinh> list = new ArrayList<>();
@@ -1141,6 +1204,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
+
     // ----------------- LopHoc -----------------
     public long insertLopHoc(LopHoc l) {
         SQLiteDatabase db = getWritableDatabase();
@@ -1259,6 +1323,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return rows;
     }
+
     private Diem buildDiemFromCursor(Cursor c) {
         Diem d = new Diem(
                 c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
@@ -1274,6 +1339,7 @@ public class DBHelper extends SQLiteOpenHelper {
         d.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
         return d;
     }
+
     // Lấy thông tin người dùng theo id
     public NguoiDung getUserById(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -1307,28 +1373,37 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Đổi mật khẩu: so sánh mật khẩu cũ trước
-    public boolean changePassword(int userId, String oldPass, String newPass) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT matKhau FROM NguoiDung WHERE id=?",
-                new String[]{String.valueOf(userId)});
-        if (c != null && c.moveToFirst()) {
-            String current = c.getString(0);
-            c.close();
-            if (!current.equals(oldPass)) { // Ở đây bạn có thể hash password nếu muốn
-                return false;
+// DBHelper.java
+    public boolean changePassword(int userId, String oldPassword, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = null;
+        try {
+            // Lấy mật khẩu hiện tại
+            cursor = db.rawQuery("SELECT matKhau FROM NguoiDung WHERE id = ?",
+                    new String[]{String.valueOf(userId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                String storedHash = cursor.getString(0);
+                String oldHash = HashUtils.sha256(oldPassword);
+
+                if (!storedHash.equals(oldHash)) {
+                    // Sai mật khẩu cũ
+                    return false;
+                }
+
+                // Đúng -> cập nhật mật khẩu mới
+                String newHash = HashUtils.sha256(newPassword);
+                ContentValues values = new ContentValues();
+                values.put("matKhau", newHash);
+                int rows = db.update("NguoiDung", values, "id=?", new String[]{String.valueOf(userId)});
+                return rows > 0;
             }
-        } else {
-            if (c != null) c.close();
             return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (cursor != null) cursor.close();
         }
-
-        // Nếu đúng -> cập nhật mật khẩu mới
-        SQLiteDatabase wdb = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("matKhau", newPass);
-        int rows = wdb.update("NguoiDung", values, "id=?", new String[]{String.valueOf(userId)});
-        return rows > 0;
     }
-
 }
 
