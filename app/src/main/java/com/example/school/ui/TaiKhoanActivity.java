@@ -36,7 +36,7 @@ public class TaiKhoanActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         Toolbar toolbar = findViewById(R.id.toolbarTK);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar()!=null) { getSupportActionBar().setDisplayHomeAsUpEnabled(true); getSupportActionBar().setTitle("Thời khóa biểu"); }
+        if (getSupportActionBar()!=null) { getSupportActionBar().setDisplayHomeAsUpEnabled(true); getSupportActionBar().setTitle("THồ sơ cá nhân"); }
         toolbar.setNavigationOnClickListener(v -> finish());
 
         // Load user info từ DB
