@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView; // appcompat
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,23 +53,15 @@ public class UserManagementActivity extends AppCompatActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
         searchView = findViewById(R.id.searchUsers);
         fab = findViewById(R.id.fabAddUser);
-
-        // chỉ admin mới thấy add button
         String role = session.getUserRole();
         fab.setVisibility("admin".equalsIgnoreCase(role) ? View.VISIBLE : View.GONE);
-
         loadUsers();
 
         fab.setOnClickListener(v -> showAddEditDialog(null));
-
-        // search
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override public boolean onQueryTextSubmit(String query) { adapter.filter(query); return true; }
             @Override public boolean onQueryTextChange(String newText) { adapter.filter(newText); return true; }
         });
-
-        // long click -> edit/delete
-        // handled inside adapter via callback
     }
 
     private void loadUsers() {
@@ -147,7 +139,6 @@ public class UserManagementActivity extends AppCompatActivity {
                 Cursor c = null;
                 try {
                     if (editing == null) {
-                        // CREATE: check username exists
                         c = rdb.rawQuery("SELECT id FROM NguoiDung WHERE tenDangNhap=? LIMIT 1",
                                 new String[]{ username });
                         boolean exists = (c != null && c.moveToFirst());
@@ -156,8 +147,6 @@ public class UserManagementActivity extends AppCompatActivity {
                             etUser.setError("Tên đăng nhập đã tồn tại");
                             return;
                         }
-
-                        // create via DBHelper.registerUser (it should hash internally)
                         boolean ok = db.registerUser(username, password.isEmpty() ? "123" : password,
                                 roleSel, email, phone);
                         if (ok) {
@@ -168,7 +157,6 @@ public class UserManagementActivity extends AppCompatActivity {
                             Toast.makeText(this, "Tạo tài khoản thất bại", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        // UPDATE: check username exists for other users (id <> editing.getId())
                         c = rdb.rawQuery("SELECT id FROM NguoiDung WHERE tenDangNhap=? AND id<>? LIMIT 1",
                                 new String[]{ username, String.valueOf(editing.getId()) });
                         boolean conflict = (c != null && c.moveToFirst());
@@ -177,13 +165,10 @@ public class UserManagementActivity extends AppCompatActivity {
                             etUser.setError("Tên đăng nhập đã được dùng");
                             return;
                         }
-
-                        // perform update (hash password if provided)
                         SQLiteDatabase wdb = db.getWritableDatabase();
                         android.content.ContentValues cv = new android.content.ContentValues();
                         cv.put("tenDangNhap", username);
                         if (!password.isEmpty()) {
-                            // hash password before storing (keep consistent with registerUser)
                             String hashed = HashUtils.sha256(password);
                             cv.put("matKhau", hashed);
                         }
