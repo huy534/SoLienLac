@@ -52,6 +52,10 @@
             android:exported="false" />
 <activity android:name=".ui.MonHocDetailActivity"
     android:exported="false" />
+        <activity
+            android:name=".ui.UserManagementActivity"
+            android:exported="false" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -309,6 +309,116 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return u;
     }
+    public boolean registerUser(String username, String password, String role, String email, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("tenDangNhap", username);
+        cv.put("matKhau", HashUtils.sha256(password)); // Hash SHA-256
+        cv.put("vaiTro", role);
+        cv.put("email", email);
+        cv.put("sdt", phone);
+        long result = db.insert("NguoiDung", null, cv);
+        return result != -1;
+    }
+    public List<NguoiDung> getAllUsers() {
+        List<NguoiDung> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM NguoiDung", null);
+        if (c != null) {
+            while (c.moveToNext()) {
+                NguoiDung u = new NguoiDung(
+                        c.getInt(c.getColumnIndexOrThrow("id")),
+                        c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
+                        c.getString(c.getColumnIndexOrThrow("matKhau")),
+                        c.getString(c.getColumnIndexOrThrow("vaiTro")),
+                        c.getString(c.getColumnIndexOrThrow("email")),
+                        c.getString(c.getColumnIndexOrThrow("sdt"))
+                );
+                list.add(u);
+            }
+            c.close();
+        }
+        db.close();
+        return list;
+    }
+
+    // Lấy người dùng theo vai trò
+    public List<NguoiDung> getUsersByRole(String role) {
+        List<NguoiDung> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM NguoiDung WHERE vaiTro=?", new String[]{role});
+        if (c != null) {
+            while (c.moveToNext()) {
+                list.add(new NguoiDung(
+                        c.getInt(c.getColumnIndexOrThrow("id")),
+                        c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
+                        c.getString(c.getColumnIndexOrThrow("matKhau")),
+                        c.getString(c.getColumnIndexOrThrow("vaiTro")),
+                        c.getString(c.getColumnIndexOrThrow("email")),
+                        c.getString(c.getColumnIndexOrThrow("sdt"))
+                ));
+            }
+            c.close();
+        }
+        db.close();
+        return list;
+    }
+
+    // Lấy người dùng theo id
+    public NguoiDung getUserById(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM NguoiDung WHERE id=?", new String[]{String.valueOf(id)});
+        NguoiDung u = null;
+        if (c != null && c.moveToFirst()) {
+            u = new NguoiDung(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
+                    c.getString(c.getColumnIndexOrThrow("matKhau")),
+                    c.getString(c.getColumnIndexOrThrow("vaiTro")),
+                    c.getString(c.getColumnIndexOrThrow("email")),
+                    c.getString(c.getColumnIndexOrThrow("sdt"))
+            );
+            c.close();
+        } else if (c != null) c.close();
+        db.close();
+        return u;
+    }
+
+    // Cập nhật user (nếu password rỗng => giữ nguyên)
+    public int updateUser(NguoiDung u) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("tenDangNhap", u.getTenDangNhap());
+        if (u.getMatKhau() != null && !u.getMatKhau().isEmpty()) {
+            // nếu truyền mật khẩu thô thì hash; nếu bạn đã truyền hash sẵn thì bỏ bước này
+            String hashed = HashUtils.sha256(u.getMatKhau());
+            cv.put("matKhau", hashed);
+        }
+        cv.put("vaiTro", u.getVaiTro());
+        cv.put("email", u.getEmail());
+        cv.put("sdt", u.getSdt());
+        int rows = db.update("NguoiDung", cv, "id=?", new String[]{String.valueOf(u.getId())});
+        db.close();
+        return rows;
+    }
+
+    // Xóa user (trả về số rows)
+    public int deleteUser(int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        int rows = db.delete("NguoiDung", "id=?", new String[]{String.valueOf(id)});
+        db.close();
+        return rows;
+    }
+
+    // Kiểm tra username đã tồn tại khác id hiện tại (dùng khi edit để tránh trùng với bản ghi khác)
+    public boolean usernameExistsOtherThan(String username, int excludeId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT id FROM NguoiDung WHERE tenDangNhap=? AND id<>?", new String[]{username, String.valueOf(excludeId)});
+        boolean ex = c != null && c.moveToFirst();
+        if (c != null) c.close();
+        db.close();
+        return ex;
+    }
 
     // ----------------- MonHoc -----------------
     public long insertMonHoc(MonHoc mh) {

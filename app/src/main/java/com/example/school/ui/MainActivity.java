@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private DBHelper db;
 
     private TextView tvWelcome;
-    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnLogout;
+    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         btnMonHoc = findViewById(R.id.btnMonHoc);
         btnDiem = findViewById(R.id.btnDiem);
         btnLogout = findViewById(R.id.btnLogout);
+        btnUsers = findViewById(R.id.btnUsers); // ensure this id exists in activity_main.xml
 
         // Lấy thông tin session
         int userId = session.getUserId();
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         btnLopHoc.setOnClickListener(v -> startActivity(new Intent(this, LopHocActivity.class)));
         btnMonHoc.setOnClickListener(v -> startActivity(new Intent(this, MonHocActivity.class)));
         btnDiem.setOnClickListener(v -> startActivity(new Intent(this, DiemActivity.class)));
-
+        if (btnUsers != null) btnUsers.setOnClickListener(v -> startActivity(new Intent(this, com.example.school.ui.UserManagementActivity.class)));
         // Logout: clear session và quay về Login
         btnLogout.setOnClickListener(v -> {
             session.clearSession();
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         role = role.toLowerCase().trim();
 
         // default: ẩn tất cả, bật những cái cần thiết
+        btnUsers.setVisibility(View.GONE);
         btnHocSinh.setVisibility(View.GONE);
         btnLopHoc.setVisibility(View.GONE);
         btnMonHoc.setVisibility(View.GONE);
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 btnLopHoc.setVisibility(View.VISIBLE);
                 btnMonHoc.setVisibility(View.VISIBLE);
                 btnDiem.setVisibility(View.VISIBLE);
+                btnUsers.setVisibility(View.VISIBLE);
                 break;
             case "giaovien":
                 btnHocSinh.setVisibility(View.GONE); // optional: ẩn hoặc hiển thị tùy bạn
