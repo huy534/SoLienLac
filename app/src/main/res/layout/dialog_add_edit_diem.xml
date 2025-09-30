@@ -28,55 +28,133 @@
             android:textSize="14sp"
             android:layout_marginBottom="8dp"/>
 
-        <!-- Mã HS (editable for add) -->
-        <EditText
-            android:id="@+id/etHocSinhId"
+        <!-- Mã HS -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Mã học sinh (ID)"
-            android:inputType="number"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Mã HS:"/>
+            <EditText
+                android:id="@+id/etHocSinhId"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="number"
+                android:hint="ID HS"/>
+        </LinearLayout>
 
-        <!-- Mã Môn (editable for add) -->
-        <EditText
-            android:id="@+id/etMonId"
+        <!-- Mã Môn -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Mã môn (ID)"
-            android:inputType="number"
-            android:layout_marginTop="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Mã môn:"/>
+            <EditText
+                android:id="@+id/etMonId"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="number"
+                android:hint="ID môn"/>
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/etDiemHS1"
+        <!-- Điểm HS1 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Điểm hệ số 1"
-            android:inputType="numberDecimal"
-            android:layout_marginTop="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Điểm HS1:"/>
+            <EditText
+                android:id="@+id/etDiemHS1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="numberDecimal"
+                android:hint="Hệ số 1"/>
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/etDiemHS2"
+        <!-- Điểm HS2 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Điểm hệ số 2"
-            android:inputType="numberDecimal"
-            android:layout_marginTop="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Điểm HS2:"/>
+            <EditText
+                android:id="@+id/etDiemHS2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="numberDecimal"
+                android:hint="Hệ số 2"/>
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/etDiemThi"
+        <!-- Điểm thi -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Điểm thi học kỳ"
-            android:inputType="numberDecimal"
-            android:layout_marginTop="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Điểm thi:"/>
+            <EditText
+                android:id="@+id/etDiemThi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="numberDecimal"
+                android:hint="Thi HK"/>
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/etNhanXet"
+        <!-- Nhận xét -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhận xét"
-            android:inputType="text"
-            android:layout_marginTop="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nhận xét:"/>
+            <EditText
+                android:id="@+id/etNhanXet"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:inputType="text"
+                android:hint="Ghi chú"/>
+        </LinearLayout>
 
+        <!-- Điểm danh -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
