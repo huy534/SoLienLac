@@ -1,5 +1,7 @@
 package com.example.school.ui;
 
+import static com.example.school.R.*;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -18,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private DBHelper db;
 
     private TextView tvWelcome;
-    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout, btnTKB;
+    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout, btnTKB, btnTaiKhoan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
         btnUsers = findViewById(R.id.btnUsers);
         btnTKB = findViewById(R.id.btnTKB);
+        btnTaiKhoan = findViewById(R.id.btnTaiKhoan);
+
         int userId = session.getUserId();
         String role = session.getUserRole(); 
         String username = "";
@@ -57,7 +61,10 @@ public class MainActivity extends AppCompatActivity {
         btnMonHoc.setOnClickListener(v -> startActivity(new Intent(this, MonHocActivity.class)));
         btnDiem.setOnClickListener(v -> startActivity(new Intent(this, DiemActivity.class)));
         if (btnUsers != null) btnUsers.setOnClickListener(v -> startActivity(new Intent(this, com.example.school.ui.UserManagementActivity.class)));
-
+        btnTaiKhoan.setOnClickListener(v -> {
+            Intent i = new Intent(MainActivity.this, TaiKhoanActivity.class);
+            startActivity(i);
+        });
         btnLogout.setOnClickListener(v -> {
             session.clearSession();
             Intent i = new Intent(MainActivity.this, LoginActivity.class);

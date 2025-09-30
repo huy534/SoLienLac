@@ -98,6 +98,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Thời khóa biểu" />
+                        <Button
+                            android:id="@+id/btnTaiKhoan"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Tài khoản"
+                            android:layout_marginTop="8dp"/>
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>

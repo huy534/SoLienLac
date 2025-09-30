@@ -17,7 +17,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 15;
+    private static final int DB_VERSION = 20;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -28,6 +28,7 @@ public class DBHelper extends SQLiteOpenHelper {
         // NguoiDung
         db.execSQL("CREATE TABLE IF NOT EXISTS NguoiDung (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "hoTen TEXT," +
                 "tenDangNhap TEXT UNIQUE," +
                 "matKhau TEXT," +
                 "vaiTro TEXT," +
@@ -323,6 +324,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if (c != null && c.moveToFirst()) {
             u = new NguoiDung(
                     c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("hoTen")),
                     c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
                     c.getString(c.getColumnIndexOrThrow("matKhau")),
                     c.getString(c.getColumnIndexOrThrow("vaiTro")),
@@ -353,6 +355,7 @@ public class DBHelper extends SQLiteOpenHelper {
             while (c.moveToNext()) {
                 NguoiDung u = new NguoiDung(
                         c.getInt(c.getColumnIndexOrThrow("id")),
+                        c.getString(c.getColumnIndexOrThrow("hoTen")),
                         c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
                         c.getString(c.getColumnIndexOrThrow("matKhau")),
                         c.getString(c.getColumnIndexOrThrow("vaiTro")),
@@ -376,6 +379,7 @@ public class DBHelper extends SQLiteOpenHelper {
             while (c.moveToNext()) {
                 list.add(new NguoiDung(
                         c.getInt(c.getColumnIndexOrThrow("id")),
+                        c.getString(c.getColumnIndexOrThrow("hoTen")),
                         c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
                         c.getString(c.getColumnIndexOrThrow("matKhau")),
                         c.getString(c.getColumnIndexOrThrow("vaiTro")),
@@ -390,24 +394,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Lấy người dùng theo id
-    public NguoiDung getUserById(int id) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM NguoiDung WHERE id=?", new String[]{String.valueOf(id)});
-        NguoiDung u = null;
-        if (c != null && c.moveToFirst()) {
-            u = new NguoiDung(
-                    c.getInt(c.getColumnIndexOrThrow("id")),
-                    c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
-                    c.getString(c.getColumnIndexOrThrow("matKhau")),
-                    c.getString(c.getColumnIndexOrThrow("vaiTro")),
-                    c.getString(c.getColumnIndexOrThrow("email")),
-                    c.getString(c.getColumnIndexOrThrow("sdt"))
-            );
-            c.close();
-        } else if (c != null) c.close();
-        db.close();
-        return u;
-    }
+
 
     // Cập nhật user (nếu password rỗng => giữ nguyên)
     public int updateUser(NguoiDung u) {
@@ -1286,6 +1273,61 @@ public class DBHelper extends SQLiteOpenHelper {
         d.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
         d.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
         return d;
+    }
+    // Lấy thông tin người dùng theo id
+    public NguoiDung getUserById(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        NguoiDung user = null;
+        Cursor c = db.rawQuery("SELECT id, hoTen, tenDangNhap, matKhau, vaiTro, email, sdt FROM NguoiDung WHERE id=?",
+                new String[]{String.valueOf(id)});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                user = new NguoiDung();
+                user.setId(c.getInt(0));
+                user.setHoTen(c.getString(1));
+                user.setTenDangNhap(c.getString(2));
+                user.setMatKhau(c.getString(3));
+                user.setVaiTro(c.getString(4));
+                user.setEmail(c.getString(5));
+                user.setSdt(c.getString(6));
+            }
+            c.close();
+        }
+        return user;
+    }
+
+    // Cập nhật thông tin (không đổi mật khẩu ở đây)
+    public int updateUserInfo(NguoiDung u) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("hoTen", u.getHoTen());
+        values.put("email", u.getEmail());
+        values.put("sdt", u.getSdt());
+        return db.update("NguoiDung", values, "id=?", new String[]{String.valueOf(u.getId())});
+    }
+
+    // Đổi mật khẩu: so sánh mật khẩu cũ trước
+    public boolean changePassword(int userId, String oldPass, String newPass) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT matKhau FROM NguoiDung WHERE id=?",
+                new String[]{String.valueOf(userId)});
+        if (c != null && c.moveToFirst()) {
+            String current = c.getString(0);
+            c.close();
+            if (!current.equals(oldPass)) { // Ở đây bạn có thể hash password nếu muốn
+                return false;
+            }
+        } else {
+            if (c != null) c.close();
+            return false;
+        }
+
+        // Nếu đúng -> cập nhật mật khẩu mới
+        SQLiteDatabase wdb = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("matKhau", newPass);
+        int rows = wdb.update("NguoiDung", values, "id=?", new String[]{String.valueOf(userId)});
+        return rows > 0;
     }
 
 }
