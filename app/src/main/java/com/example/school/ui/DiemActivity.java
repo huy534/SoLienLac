@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView; // <-- quan trọng: appcompat SearchView
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,16 +28,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * DiemActivity (đã sửa import SearchView để tránh ClassCastException)
- */
 public class DiemActivity extends AppCompatActivity {
 
     private DBHelper db;
     private SessionManager session;
     private RecyclerView recyclerView;
     private DiemAdapter adapter;
-    private SearchView searchView;           // androidx.appcompat.widget.SearchView
+    private SearchView searchView;
     private FloatingActionButton fabAdd;
 
     @Override
@@ -48,12 +45,10 @@ public class DiemActivity extends AppCompatActivity {
         db = new DBHelper(this);
         session = new SessionManager(this);
 
-        // views
         recyclerView = findViewById(R.id.recyclerViewDiem);
         searchView = findViewById(R.id.searchDiem);
         fabAdd = findViewById(R.id.fabAddDiem);
 
-        // optional toolbar (if present in layout)
         Toolbar toolbar = findViewById(R.id.toolbarDiem);
         if (toolbar != null) setSupportActionBar(toolbar);
 
@@ -61,32 +56,36 @@ public class DiemActivity extends AppCompatActivity {
 
         String role = session.getUserRole() == null ? "" : session.getUserRole().trim().toLowerCase(Locale.getDefault());
         int userId = session.getUserId();
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Danh sách điểm"); // đổi tiêu đề tùy activity
+            getSupportActionBar().setTitle("Danh sách điểm");
         }
+
         List<Diem> list;
         if (role.contains("giaovien")) {
             list = db.getDiemByTeacher(userId);
             fabAdd.setVisibility(View.VISIBLE);
-            fabAdd.setOnClickListener(v -> showDetailDialog(null));
+            fabAdd.setOnClickListener(v -> showDetailDialog(null, true));
         } else if (role.contains("phuhuynh")) {
             list = db.getDiemByParent(userId);
             fabAdd.setVisibility(View.GONE);
         } else {
-            // admin / other
-            list = db.getAllDiem();
+            list = db.getAllDiem(); // admin
             fabAdd.setVisibility(View.VISIBLE);
-            fabAdd.setOnClickListener(v -> showDetailDialog(null));
+            fabAdd.setOnClickListener(v -> showDetailDialog(null, true));
         }
 
         adapter = new DiemAdapter(list);
         recyclerView.setAdapter(adapter);
 
-        // long-press edit
-        adapter.setOnItemLongClickListener(item -> showDetailDialog(item));
+        // set long click theo role
+        if (role.contains("phuhuynh")) {
+            adapter.setOnItemLongClickListener(item -> showDetailDialog(item, false)); // chỉ xem
+        } else {
+            adapter.setOnItemLongClickListener(item -> showDetailDialog(item, true)); // sửa/xóa
+        }
 
-        // SearchView -> dùng appcompat SearchView listener
         if (searchView != null) {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override public boolean onQueryTextSubmit(String query) { adapter.filter(query); return true; }
@@ -106,10 +105,6 @@ public class DiemActivity extends AppCompatActivity {
         else fresh = db.getAllDiem();
         adapter.updateData(fresh);
         findViewById(R.id.tvEmptyDiem).setVisibility(fresh == null || fresh.isEmpty() ? View.VISIBLE : View.GONE);
-    }
-
-    private float computeTB(float hs1, float hs2, float thi) {
-        return (float)((hs1 + 2.0*hs2 + 3.0*thi) / 6.0);
     }
 
     private String loadStudentName(int studentId) {
@@ -134,7 +129,7 @@ public class DiemActivity extends AppCompatActivity {
         return name == null ? "" : name;
     }
 
-    private void showDetailDialog(Diem diem) {
+    private void showDetailDialog(Diem diem, boolean editable) {
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_add_edit_diem, null);
 
@@ -164,71 +159,82 @@ public class DiemActivity extends AppCompatActivity {
 
             tvStudentName.setText(loadStudentName(diem.getHocSinhId()));
             tvSubjectName.setText(loadSubjectName(diem.getMonId()));
+        }
 
-            int status = db.getAttendanceStatus(diem.getHocSinhId(), diem.getMonId(), today());
-            if (status >= 0 && status <= 3) spDiemDanh.setSelection(status);
-        } else {
-            tvStudentName.setText("Chưa chọn học sinh");
-            tvSubjectName.setText("Chưa chọn môn");
+        if (!editable) {
+            etHocSinhId.setEnabled(false);
+            etMonId.setEnabled(false);
+            etDiemHS1.setEnabled(false);
+            etDiemHS2.setEnabled(false);
+            etDiemThi.setEnabled(false);
+            etNhanXet.setEnabled(false);
+            spDiemDanh.setEnabled(false);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(diem == null ? "Thêm điểm" : "Chi tiết/Sửa điểm")
+                .setTitle(editable ? (diem == null ? "Thêm điểm" : "Chi tiết điểm") : "Chi tiết điểm")
                 .setView(v)
-                .setPositiveButton("Lưu", null)
-                .setNegativeButton("Hủy", (d, w) -> {})
-                .setNeutralButton(diem == null ? null : "Xóa", null);
+                .setNegativeButton("Đóng", null);
+
+        if (editable) {
+            builder.setPositiveButton("Lưu", null);
+            if (diem != null) builder.setNeutralButton("Xóa", null);
+        }
 
         AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(dialogInterface -> {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
-                int hsId = parseIntSafe(etHocSinhId.getText().toString().trim(), -1);
-                int monId = parseIntSafe(etMonId.getText().toString().trim(), -1);
-                float hs1 = parseFloatSafe(etDiemHS1.getText().toString().trim(), 0f);
-                float hs2 = parseFloatSafe(etDiemHS2.getText().toString().trim(), 0f);
-                float thi = parseFloatSafe(etDiemThi.getText().toString().trim(), 0f);
-                String nhanXet = etNhanXet.getText().toString().trim();
-                int attendance = spDiemDanh.getSelectedItemPosition();
+        if (editable) {
+            dialog.setOnShowListener(dialogInterface -> {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+                    int hsId = parseIntSafe(etHocSinhId.getText().toString().trim(), -1);
+                    int monId = parseIntSafe(etMonId.getText().toString().trim(), -1);
+                    float hs1 = parseFloatSafe(etDiemHS1.getText().toString().trim(), 0f);
+                    float hs2 = parseFloatSafe(etDiemHS2.getText().toString().trim(), 0f);
+                    float thi = parseFloatSafe(etDiemThi.getText().toString().trim(), 0f);
+                    String nhanXet = etNhanXet.getText().toString().trim();
+                    int attendance = spDiemDanh.getSelectedItemPosition();
 
-                if (hsId <= 0 || monId <= 0) {
-                    Toast.makeText(DiemActivity.this, "Nhập mã học sinh và mã môn hợp lệ", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                    if (hsId <= 0 || monId <= 0) {
+                        Toast.makeText(DiemActivity.this, "Nhập mã học sinh và mã môn hợp lệ", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-                try {
-                    db.upsertDiem(hsId, monId, hs1, hs2, thi, nhanXet);
-                    db.markAttendance(hsId, monId, today(), attendance);
-                    Toast.makeText(DiemActivity.this, "Lưu thành công", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                    refreshList();
-                } catch (Exception ex) {
-                    Toast.makeText(DiemActivity.this, "Lỗi lưu: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+                    try {
+                        db.upsertDiem(hsId, monId, hs1, hs2, thi, nhanXet);
+                        db.markAttendance(hsId, monId, today(), attendance);
+                        Toast.makeText(DiemActivity.this, "Lưu thành công", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        refreshList();
+                    } catch (Exception ex) {
+                        Toast.makeText(DiemActivity.this, "Lỗi lưu: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                if (diem != null) {
+                    dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(vBtn -> {
+                        new AlertDialog.Builder(DiemActivity.this)
+                                .setTitle("Xác nhận")
+                                .setMessage("Bạn có muốn xóa điểm này không?")
+                                .setPositiveButton("Xóa", (dd, ww) -> {
+                                    SQLiteDatabase wdb = db.getWritableDatabase();
+                                    int rows = wdb.delete("Diem", "hocSinhId=? AND monId=?", new String[]{String.valueOf(diem.getHocSinhId()), String.valueOf(diem.getMonId())});
+                                    Toast.makeText(DiemActivity.this, rows > 0 ? "Đã xóa" : "Xóa thất bại", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                    refreshList();
+                                })
+                                .setNegativeButton("Hủy", null)
+                                .show();
+                    });
                 }
             });
-
-            if (diem != null) {
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(vBtn -> {
-                    new AlertDialog.Builder(DiemActivity.this)
-                            .setTitle("Xác nhận")
-                            .setMessage("Bạn có muốn xóa điểm này không?")
-                            .setPositiveButton("Xóa", (dd, ww) -> {
-                                SQLiteDatabase wdb = db.getWritableDatabase();
-                                int rows = wdb.delete("Diem", "hocSinhId=? AND monId=?", new String[]{String.valueOf(diem.getHocSinhId()), String.valueOf(diem.getMonId())});
-                                Toast.makeText(DiemActivity.this, rows > 0 ? "Đã xóa" : "Xóa thất bại", Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
-                                refreshList();
-                            })
-                            .setNegativeButton("Hủy", null)
-                            .show();
-                });
-            }
-        });
+        }
         dialog.show();
     }
+
     public boolean onSupportNavigateUp() {
-        finish(); // thoát Activity hiện tại
+        finish();
         return true;
     }
+
     private String today() {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return sdf.format(new java.util.Date());

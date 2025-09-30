@@ -56,6 +56,11 @@ public class DiemAdapter extends RecyclerView.Adapter<DiemAdapter.VH> {
             tenHS = "HS ID: " + d.getHocSinhId();
         }
         holder.tvTenHocSinh.setText(tenHS);
+        String tenLop = d.getTenLop();
+        if (tenLop == null || tenLop.trim().isEmpty()) {
+            tenLop = "(Chưa có lớp)";
+        }
+        holder.tvTenLop.setText("Lớp: " + tenLop);
 
         String tenMon = d.getTenMon();
         if (tenMon == null || tenMon.trim().isEmpty()) {
@@ -121,10 +126,11 @@ public class DiemAdapter extends RecyclerView.Adapter<DiemAdapter.VH> {
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView tvTenHocSinh, tvTenMon, tvDiemTB, tvNote;
+        TextView tvTenHocSinh, tvTenLop, tvTenMon, tvDiemTB, tvNote;
         VH(View v) {
             super(v);
             tvTenHocSinh = v.findViewById(R.id.tvTenHocSinh);
+            tvTenLop = v.findViewById(R.id.tvTenLop);
             tvTenMon = v.findViewById(R.id.tvTenMon);
             tvDiemTB = v.findViewById(R.id.tvDiemTB);
             tvNote = v.findViewById(R.id.tvNote);

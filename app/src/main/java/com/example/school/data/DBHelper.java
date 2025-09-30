@@ -663,28 +663,27 @@ public class DBHelper extends SQLiteOpenHelper {
     // Get Diem rows for parent (students mapped)
     public List<Diem> getDiemByParent(int parentUserId) {
         List<Diem> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(
-                "SELECT d.* FROM Diem d JOIN ParentStudent ps ON d.hocSinhId = ps.studentId WHERE ps.userId=?",
+                "SELECT d.*, hs.hoTen, l.tenLop, m.tenMon " +
+                        "FROM Diem d " +
+                        "JOIN HocSinh hs ON d.hocSinhId = hs.id " +
+                        "JOIN LopHoc l ON hs.maLop = l.id " +
+                        "JOIN MonHoc m ON d.monId = m.id " +
+                        "JOIN ParentStudent ps ON hs.id = ps.studentId " +
+                        "WHERE ps.userId = ?",
                 new String[]{String.valueOf(parentUserId)}
         );
         if (c != null) {
             while (c.moveToNext()) {
-                list.add(new Diem(
-                        c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
-                        c.getInt(c.getColumnIndexOrThrow("monId")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemThi")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemTB")),
-                        c.getString(c.getColumnIndexOrThrow("nhanXet"))
-                ));
+                Diem d = buildDiemFromCursor(c);
+                list.add(d);
             }
             c.close();
         }
-        db.close();
         return list;
     }
+
     // Lấy lớp mà giáo viên chủ nhiệm
 
 
@@ -758,31 +757,25 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Diem by teacher (students in classes teacher is gvcn)
-    public List<Diem> getDiemByTeacher(int teacherUserId) {
+    public List<Diem> getDiemByTeacher(int teacherId) {
         List<Diem> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(
-                "SELECT d.* FROM Diem d " +
+                "SELECT d.*, hs.hoTen, l.tenLop, m.tenMon " +
+                        "FROM Diem d " +
                         "JOIN HocSinh hs ON d.hocSinhId = hs.id " +
                         "JOIN LopHoc l ON hs.maLop = l.id " +
-                        "WHERE l.gvcn = ?",
-                new String[]{String.valueOf(teacherUserId)}
+                        "JOIN MonHoc m ON d.monId = m.id " +
+                        "WHERE l.gvcn = ? OR m.teacherId = ?",
+                new String[]{String.valueOf(teacherId), String.valueOf(teacherId)}
         );
         if (c != null) {
             while (c.moveToNext()) {
-                list.add(new Diem(
-                        c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
-                        c.getInt(c.getColumnIndexOrThrow("monId")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemThi")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemTB")),
-                        c.getString(c.getColumnIndexOrThrow("nhanXet"))
-                ));
+                Diem d = buildDiemFromCursor(c);
+                list.add(d);
             }
             c.close();
         }
-        db.close();
         return list;
     }
 
@@ -1015,23 +1008,22 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public List<Diem> getAllDiem() {
         List<Diem> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM Diem", null);
-        if (c.moveToFirst()) {
-            do {
-                list.add(new Diem(
-                        c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
-                        c.getInt(c.getColumnIndexOrThrow("monId")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemThi")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemTB")),
-                        c.getString(c.getColumnIndexOrThrow("nhanXet"))
-                ));
-            } while (c.moveToNext());
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(
+                "SELECT d.*, hs.hoTen, l.tenLop, m.tenMon " +
+                        "FROM Diem d " +
+                        "JOIN HocSinh hs ON d.hocSinhId = hs.id " +
+                        "JOIN LopHoc l ON hs.maLop = l.id " +
+                        "JOIN MonHoc m ON d.monId = m.id",
+                null
+        );
+        if (c != null) {
+            while (c.moveToNext()) {
+                Diem d = buildDiemFromCursor(c);
+                list.add(d);
+            }
+            c.close();
         }
-        c.close();
-        db.close();
         return list;
     }
 
@@ -1071,5 +1063,21 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return rows;
     }
+    private Diem buildDiemFromCursor(Cursor c) {
+        Diem d = new Diem(
+                c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
+                c.getInt(c.getColumnIndexOrThrow("monId")),
+                c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
+                c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
+                c.getFloat(c.getColumnIndexOrThrow("diemThi")),
+                c.getFloat(c.getColumnIndexOrThrow("diemTB")),
+                c.getString(c.getColumnIndexOrThrow("nhanXet"))
+        );
+        d.setTenHocSinh(c.getString(c.getColumnIndexOrThrow("hoTen")));
+        d.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
+        d.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
+        return d;
+    }
+
 }
 

@@ -4,6 +4,7 @@ public class Diem {
     private int hocSinhId;
     private int monId;
     private String tenHocSinh;
+    private String tenLop;      // ✅ thêm tên lớp
     private String tenMon;
 
     private float diemHS1;
@@ -22,6 +23,7 @@ public class Diem {
         this.diemTB = diemTB;
         this.nhanXet = nhanXet;
     }
+
     public int getHocSinhId() { return hocSinhId; }
     public void setHocSinhId(int hocSinhId) { this.hocSinhId = hocSinhId; }
 
@@ -30,6 +32,9 @@ public class Diem {
 
     public String getTenHocSinh() { return tenHocSinh; }
     public void setTenHocSinh(String tenHocSinh) { this.tenHocSinh = tenHocSinh; }
+
+    public String getTenLop() { return tenLop; }         // ✅ getter
+    public void setTenLop(String tenLop) { this.tenLop = tenLop; }  // ✅ setter
 
     public String getTenMon() { return tenMon; }
     public void setTenMon(String tenMon) { this.tenMon = tenMon; }
