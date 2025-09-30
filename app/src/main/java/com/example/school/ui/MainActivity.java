@@ -27,50 +27,36 @@ public class MainActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         db = new DBHelper(this);
-
-        // nếu chưa login -> về LoginActivity
         if (!session.isLoggedIn()) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
-
-        // Ánh xạ view
         tvWelcome = findViewById(R.id.tvWelcome);
         btnHocSinh = findViewById(R.id.btnHocSinh);
         btnLopHoc = findViewById(R.id.btnLopHoc);
         btnMonHoc = findViewById(R.id.btnMonHoc);
         btnDiem = findViewById(R.id.btnDiem);
         btnLogout = findViewById(R.id.btnLogout);
-        btnUsers = findViewById(R.id.btnUsers); // ensure this id exists in activity_main.xml
-
-        // Lấy thông tin session
+        btnUsers = findViewById(R.id.btnUsers);
         int userId = session.getUserId();
-        String role = session.getUserRole(); // SessionManager lưu role đã lower-case
+        String role = session.getUserRole(); 
         String username = "";
-
-        // Cố gắng lấy tên người dùng từ DB (DBHelper có hàm getTeacherNameById - trả tenDangNhap)
         try {
             username = db.getTeacherNameById(userId);
         } catch (Exception e) {
             username = "";
         }
         if (username == null || username.isEmpty()) username = "Người dùng " + (userId > 0 ? userId : "");
-
-        // Hiển thị chào mừng
         String roleDisplay = (role == null || role.isEmpty()) ? "user" : role;
         tvWelcome.setText("Xin chào " + username + " (" + roleDisplay + ")");
-
-        // Ẩn/hiện chức năng theo vai trò
         applyRolePermissions(role);
-
-        // Sự kiện nút
         btnHocSinh.setOnClickListener(v -> startActivity(new Intent(this, HocSinhActivity.class)));
         btnLopHoc.setOnClickListener(v -> startActivity(new Intent(this, LopHocActivity.class)));
         btnMonHoc.setOnClickListener(v -> startActivity(new Intent(this, MonHocActivity.class)));
         btnDiem.setOnClickListener(v -> startActivity(new Intent(this, DiemActivity.class)));
         if (btnUsers != null) btnUsers.setOnClickListener(v -> startActivity(new Intent(this, com.example.school.ui.UserManagementActivity.class)));
-        // Logout: clear session và quay về Login
+
         btnLogout.setOnClickListener(v -> {
             session.clearSession();
             Intent i = new Intent(MainActivity.this, LoginActivity.class);
@@ -80,19 +66,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Quyền hiển thị:
-     * - admin: thấy tất cả (HocSinh, LopHoc, MonHoc, Diem)
-     * - giaovien: thấy LopHoc, MonHoc, Diem (vì giáo viên quản lý lớp/môn của mình)
-     * - phuhuynh: chỉ thấy Diem (xem điểm con)
-     * - khác: ẩn hết (mặc định hiện Diem)
-     */
     private void applyRolePermissions(String role) {
         if (role == null) role = "";
 
         role = role.toLowerCase().trim();
 
-        // default: ẩn tất cả, bật những cái cần thiết
+       
         btnUsers.setVisibility(View.GONE);
         btnHocSinh.setVisibility(View.GONE);
         btnLopHoc.setVisibility(View.GONE);
@@ -108,17 +87,15 @@ public class MainActivity extends AppCompatActivity {
                 btnUsers.setVisibility(View.VISIBLE);
                 break;
             case "giaovien":
-                btnHocSinh.setVisibility(View.GONE); // optional: ẩn hoặc hiển thị tùy bạn
+                btnHocSinh.setVisibility(View.GONE);
                 btnLopHoc.setVisibility(View.VISIBLE);
                 btnMonHoc.setVisibility(View.VISIBLE);
                 btnDiem.setVisibility(View.VISIBLE);
                 break;
             case "phuhuynh":
                 btnDiem.setVisibility(View.VISIBLE);
-                // phụ huynh chỉ xem điểm (và sau này có thể thêm "HocPhi" nếu cần)
-                break;
+                         break;
             default:
-                // roles khác: cho hiển thị Diem read-only
                 btnDiem.setVisibility(View.VISIBLE);
                 break;
         }
