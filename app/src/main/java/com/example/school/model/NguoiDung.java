@@ -14,8 +14,6 @@ public class NguoiDung {
         this.id = id; this.tenDangNhap = tenDangNhap; this.matKhau = matKhau;
         this.vaiTro = vaiTro; this.email = email; this.sdt = sdt;
     }
-
-    // getters & setters...
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getTenDangNhap() { return tenDangNhap; }
