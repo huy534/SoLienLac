@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.school.R;
 import com.example.school.auth.SessionManager;
@@ -33,6 +34,10 @@ public class TaiKhoanActivity extends AppCompatActivity {
         etUsername = findViewById(R.id.etUsername);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
+        Toolbar toolbar = findViewById(R.id.toolbarTK);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar()!=null) { getSupportActionBar().setDisplayHomeAsUpEnabled(true); getSupportActionBar().setTitle("Thời khóa biểu"); }
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         // Load user info từ DB
         NguoiDung user = db.getUserById(userId);
