@@ -6,8 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background"/>
 
-    <!-- Standard Toolbar (dùng AppCompat để tránh yêu cầu MaterialComponents nếu chưa cấu hình theme) -->
+      <!-- Standard Toolbar (dùng AppCompat để tránh yêu cầu MaterialComponents nếu chưa cấu hình theme) -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarDiem"
         android:layout_width="0dp"
