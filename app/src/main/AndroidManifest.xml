@@ -55,6 +55,15 @@
         <activity
             android:name=".ui.UserManagementActivity"
             android:exported="false" />
+<activity android:name=".ui.TKBActivity"
+    android:exported="false" />
+<activity android:name=".ui.ChooseTKBActivity"
+    android:exported="false" />
+<activity android:name=".ui.SelectHocSinhActivity"
+    android:exported="false" />
+        <activity android:name=".ui.SelectGiaoVienActivity"
+            android:exported="false" />
+
 
 
         <provider

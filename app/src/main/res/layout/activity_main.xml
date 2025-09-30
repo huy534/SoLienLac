@@ -54,7 +54,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-
                         <Button
                             android:id="@+id/btnUsers"
                             android:layout_width="match_parent"
@@ -88,6 +87,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Điểm" />
+
+                        <!-- Nút mới cho TKB -->
+                        <Button
+                            android:id="@+id/btnTKB"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Thời khóa biểu" />
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>

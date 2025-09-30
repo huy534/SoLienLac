@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbarTKB"
+        android:id="@+id/toolbarSelectTeacher"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -15,31 +14,20 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_marginTop="?attr/actionBarSize"
-        android:padding="12dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="12dp">
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchTKB"
+            android:id="@+id/searchSelectTeacher"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:queryHint="Tìm môn / lớp..." />
+            android:queryHint="Tìm giáo viên..." />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewTKB"
+            android:id="@+id/recyclerViewSelectTeacher"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:layout_marginTop="8dp"/>
-
     </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddTKB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/ic_input_add"
-        app:layout_anchorGravity="bottom|end"
-        app:layout_anchor="@id/recyclerViewTKB"
-        android:layout_margin="16dp"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

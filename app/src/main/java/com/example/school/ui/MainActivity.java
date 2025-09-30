@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private DBHelper db;
 
     private TextView tvWelcome;
-    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout;
+    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout, btnTKB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         btnDiem = findViewById(R.id.btnDiem);
         btnLogout = findViewById(R.id.btnLogout);
         btnUsers = findViewById(R.id.btnUsers);
+        btnTKB = findViewById(R.id.btnTKB);
         int userId = session.getUserId();
         String role = session.getUserRole(); 
         String username = "";
@@ -99,6 +100,26 @@ public class MainActivity extends AppCompatActivity {
                 btnDiem.setVisibility(View.VISIBLE);
                 break;
         }
+        btnTKB.setOnClickListener(v -> {
+            int userId = session.getUserId();
+            String rl = session.getUserRole() == null ? "" : session.getUserRole().toLowerCase().trim();
+
+            if (rl.equals("admin")) {
+                // Admin: chọn loại TKB (HS / GV)
+                startActivity(new Intent(this, ChooseTKBActivity.class));
+            } else if (rl.equals("giaovien")) {
+                // Giáo viên: vào trực tiếp TKB của chính mình
+                startActivity(new Intent(this, TKBActivity.class)
+                        .putExtra("type", "giaovien")
+                        .putExtra("id", userId));
+            } else if (rl.equals("phuhuynh")) {
+                // Phụ huynh: vào trực tiếp TKB của con
+                startActivity(new Intent(this, TKBActivity.class)
+                        .putExtra("type", "hocsinh")
+                        .putExtra("id", userId));
+            }
+        });
+
     }
 
     @Override

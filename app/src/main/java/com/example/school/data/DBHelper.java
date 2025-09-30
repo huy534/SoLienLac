@@ -17,7 +17,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 14; // giữ 11 theo bạn (tăng nếu cần)
+    private static final int DB_VERSION = 15;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -215,7 +215,32 @@ public class DBHelper extends SQLiteOpenHelper {
                         new Object[]{hs[0], hs[1], hs[2], hs[3], Integer.parseInt(hs[4])});
             }
         }
-                // ---------- MON HOC ----------
+        // ---------- TKB ----------
+        if (!exists(db, "TKB", "1=1", new String[]{})) {
+            // mapping môn -> id (theo seed MonHoc bên trên)
+            int idToan = 1, idVan = 2, idAnh = 3, idLy = 4, idHoa = 5, idSinh = 6;
+
+            // Danh sách lớp (id = 1..10 theo seed LopHoc)
+            for (int lopId = 1; lopId <= 10; lopId++) {
+                // mỗi lớp có 5 ngày học (thứ 2 -> thứ 6), mỗi ngày 3 tiết
+                for (int thu = 2; thu <= 6; thu++) {
+                    for (int tiet = 1; tiet <= 3; tiet++) {
+                        int maMon;
+                        switch ((lopId + thu + tiet) % 6) {
+                            case 0: maMon = idToan; break;
+                            case 1: maMon = idVan; break;
+                            case 2: maMon = idAnh; break;
+                            case 3: maMon = idLy; break;
+                            case 4: maMon = idHoa; break;
+                            default: maMon = idSinh; break;
+                        }
+                        db.execSQL("INSERT INTO TKB (maLop, maMon, thu, tiet) VALUES (?,?,?,?)",
+                                new Object[]{lopId, maMon, thu, tiet});
+                    }
+                }
+            }
+        }
+        // ---------- MON HOC ----------
         Object[][] monHocArr = {
                 {"Toán", 4, idGvToan},
                 {"Văn", 3, idGvVan},
@@ -814,16 +839,200 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // ----------------- TKB -----------------
+    /**
+     * Insert TKB entry
+     */
     public long insertTKB(TKB tkb) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase wdb = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("maLop", tkb.getMaLop());
         cv.put("maMon", tkb.getMaMon());
         cv.put("thu", tkb.getThu());
         cv.put("tiet", tkb.getTiet());
-        long id = db.insert("TKB", null, cv);
-        db.close();
+        long id = wdb.insert("TKB", null, cv);
+        wdb.close();
         return id;
+    }
+
+    /**
+     * Update TKB entry by id
+     */
+    public int updateTKB(TKB tkb) {
+        SQLiteDatabase wdb = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("maLop", tkb.getMaLop());
+        cv.put("maMon", tkb.getMaMon());
+        cv.put("thu", tkb.getThu());
+        cv.put("tiet", tkb.getTiet());
+        int rows = wdb.update("TKB", cv, "id=?", new String[]{String.valueOf(tkb.getId())});
+        wdb.close();
+        return rows;
+    }
+
+    /**
+     * Delete TKB by id
+     */
+    public int deleteTKB(int id) {
+        SQLiteDatabase wdb = getWritableDatabase();
+        int rows = wdb.delete("TKB", "id=?", new String[]{String.valueOf(id)});
+        wdb.close();
+        return rows;
+    }
+
+    /**
+     * Get all TKB with joined display fields (tenMon, tenLop, tenGv)
+     */
+    public List<TKB> getAllTKB() {
+        List<TKB> list = new ArrayList<>();
+        SQLiteDatabase rdb = getReadableDatabase();
+        String sql = "SELECT t.id, t.maLop, t.maMon, t.thu, t.tiet, m.tenMon as tenMon, l.tenLop as tenLop, n.tenDangNhap as tenGv " +
+                "FROM TKB t " +
+                "LEFT JOIN MonHoc m ON t.maMon = m.id " +
+                "LEFT JOIN LopHoc l ON t.maLop = l.id " +
+                "LEFT JOIN NguoiDung n ON m.teacherId = n.id " +
+                "ORDER BY t.maLop, t.thu, t.tiet";
+        Cursor c = rdb.rawQuery(sql, null);
+        if (c != null) {
+            while (c.moveToNext()) {
+                TKB t = new TKB();
+                t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
+                t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
+                t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
+                t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
+                t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
+                // optional display fields
+                try { t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon"))); } catch (Exception ignored) {}
+                try { t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop"))); } catch (Exception ignored) {}
+                try { t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv"))); } catch (Exception ignored) {}
+                list.add(t);
+            }
+            c.close();
+        }
+        rdb.close();
+        return list;
+    }
+
+    /**
+     * Get TKB entries for a teacher (based on the teacherId registered on MonHoc.teacherId)
+     * Returns joined fields (tenMon, tenLop).
+     */
+    public List<TKB> getTKBByTeacher(int teacherId) {
+        List<TKB> list = new ArrayList<>();
+        SQLiteDatabase rdb = getReadableDatabase();
+        String sql = "SELECT t.id, t.maLop, t.maMon, t.thu, t.tiet, m.tenMon as tenMon, l.tenLop as tenLop " +
+                "FROM TKB t " +
+                "LEFT JOIN MonHoc m ON t.maMon = m.id " +
+                "LEFT JOIN LopHoc l ON t.maLop = l.id " +
+                "WHERE m.teacherId = ? " +
+                "ORDER BY t.thu, t.tiet";
+        Cursor c = rdb.rawQuery(sql, new String[]{String.valueOf(teacherId)});
+        if (c != null) {
+            while (c.moveToNext()) {
+                TKB t = new TKB();
+                t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
+                t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
+                t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
+                t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
+                t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
+                try { t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon"))); } catch (Exception ignored) {}
+                try { t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop"))); } catch (Exception ignored) {}
+                list.add(t);
+            }
+            c.close();
+        }
+        rdb.close();
+        return list;
+    }
+
+    /**
+     * Get TKB entries for a student -> find the student's class (maLop) and return all TKB for that class
+     */
+    public List<TKB> getTKBByStudent(int studentId) {
+        List<TKB> list = new ArrayList<>();
+        SQLiteDatabase rdb = getReadableDatabase();
+        // get class
+        int maLop = -1;
+        Cursor c1 = rdb.rawQuery("SELECT maLop FROM HocSinh WHERE id=?", new String[]{String.valueOf(studentId)});
+        if (c1 != null) {
+            if (c1.moveToFirst()) maLop = c1.getInt(0);
+            c1.close();
+        }
+        if (maLop <= 0) { rdb.close(); return list; }
+
+        String sql = "SELECT t.id, t.maLop, t.maMon, t.thu, t.tiet, m.tenMon as tenMon, l.tenLop as tenLop " +
+                "FROM TKB t " +
+                "LEFT JOIN MonHoc m ON t.maMon = m.id " +
+                "LEFT JOIN LopHoc l ON t.maLop = l.id " +
+                "WHERE t.maLop = ? " +
+                "ORDER BY t.thu, t.tiet";
+        Cursor c = rdb.rawQuery(sql, new String[]{String.valueOf(maLop)});
+        if (c != null) {
+            while (c.moveToNext()) {
+                TKB t = new TKB();
+                t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
+                t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
+                t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
+                t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
+                t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
+                try { t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon"))); } catch (Exception ignored) {}
+                try { t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop"))); } catch (Exception ignored) {}
+                list.add(t);
+            }
+            c.close();
+        }
+        rdb.close();
+        return list;
+    }
+
+    /**
+     * Get TKB for a specific class (useful for admin to view class schedules)
+     */
+    public List<TKB> getTKBByClass(int maLop) {
+        List<TKB> list = new ArrayList<>();
+        SQLiteDatabase rdb = getReadableDatabase();
+        String sql = "SELECT t.id, t.maLop, t.maMon, t.thu, t.tiet, m.tenMon as tenMon, l.tenLop as tenLop, n.tenDangNhap as tenGv " +
+                "FROM TKB t " +
+                "LEFT JOIN MonHoc m ON t.maMon = m.id " +
+                "LEFT JOIN LopHoc l ON t.maLop = l.id " +
+                "LEFT JOIN NguoiDung n ON m.teacherId = n.id " +
+                "WHERE t.maLop = ? ORDER BY t.thu, t.tiet";
+        Cursor c = rdb.rawQuery(sql, new String[]{String.valueOf(maLop)});
+        if (c != null) {
+            while (c.moveToNext()) {
+                TKB t = new TKB();
+                t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
+                t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
+                t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
+                t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
+                t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
+                try { t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon"))); } catch (Exception ignored) {}
+                try { t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop"))); } catch (Exception ignored) {}
+                try { t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv"))); } catch (Exception ignored) {}
+                list.add(t);
+            }
+            c.close();
+        }
+        rdb.close();
+        return list;
+    }
+
+
+    // helper lấy tên lớp / tên môn khi cần
+    public String getLopNameById(int id) {
+        String s = "";
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT tenLop FROM LopHoc WHERE id=?", new String[]{String.valueOf(id)});
+        if (c != null && c.moveToFirst()) { s = c.getString(0); c.close(); }
+        db.close();
+        return s;
+    }
+    public String getMonNameById(int id) {
+        String s = "";
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT tenMon FROM MonHoc WHERE id=?", new String[]{String.valueOf(id)});
+        if (c != null && c.moveToFirst()) { s = c.getString(0); c.close(); }
+        db.close();
+        return s;
     }
 
     public List<TKB> getTKBByLop(int maLop) {

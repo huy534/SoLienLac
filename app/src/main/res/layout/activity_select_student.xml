@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarSelectStudent"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:titleTextColor="@android:color/white"/>
+
+    <LinearLayout
+        android:layout_marginTop="?attr/actionBarSize"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchSelectStudent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:queryHint="Tìm học sinh..." />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewSelectStudent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
