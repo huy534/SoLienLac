@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "phuhuynh":
                 btnDiem.setVisibility(View.VISIBLE);
+                btnHocSinh.setVisibility(View.VISIBLE);
                          break;
             default:
                 btnDiem.setVisibility(View.VISIBLE);
