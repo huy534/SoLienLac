@@ -13,16 +13,40 @@ import com.example.school.model.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 20;
+    private static final int DB_VERSION = 21;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+    }
+    public static class SubjectAttendance {
+        public int monId;
+        public String tenMon;
+        public int countPresent;     // status == 0
+        public int countPermitLeave; // status == 1
+        public int countAbsent;      // status == 2
+        public int countLate;        // status == 3
+
+        public SubjectAttendance(int monId, String tenMon) {
+            this.monId = monId;
+            this.tenMon = tenMon == null ? "Môn " + monId : tenMon;
+        }
+
+        public int total() {
+            return countPresent + countPermitLeave + countAbsent + countLate;
+        }
+        public void addPresent(int c) { this.countPresent += c; }
+        public void addPermitLeave(int c) { this.countPermitLeave += c; }
+        public void addAbsent(int c) { this.countAbsent += c; }
+        public void addLate(int c) { this.countLate += c; }
     }
 
     @Override
@@ -291,6 +315,19 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
             }
         }
+        // ví dụ thêm attendance cho HS id = 6 (Do Thi F) với 4 môn (monId 1..4)
+        if (!exists(db, "Attendance", "hocSinhId=? AND monId=?", new String[]{"6","1"})) {
+            db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
+                    new Object[]{6, 1, "2025-09-01", 0});
+            db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
+                    new Object[]{6, 1, "2025-09-02", 1});
+            db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
+                    new Object[]{6, 2, "2025-09-01", 0});
+            db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
+                    new Object[]{6, 3, "2025-09-01", 3});
+            // ... thêm nhiều dòng để cho thống kê rõ ràng
+        }
+
 
         // ---------- Parent-Student mapping ----------
         for (int i = 1; i <= 50; i++) {
@@ -1405,5 +1442,110 @@ public class DBHelper extends SQLiteOpenHelper {
             if (cursor != null) cursor.close();
         }
     }
+    // Thống kê chuyên cần theo môn
+    public int getStudentIdForParent(int parentId) {
+        int id = -1;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT studentId FROM ParentStudent WHERE userId=? LIMIT 1", new String[]{String.valueOf(parentId)});
+        if (c != null) {
+            if (c.moveToFirst()) id = c.getInt(0);
+            c.close();
+        }
+        return id;
+    }
+    // Trả về danh sách AttendanceReportItem cho 1 học sinh
+    /**
+     * Trả về Map<monId, int[4]>: counts[0]=Có mặt, [1]=Vắng có phép, [2]=Vắng không phép, [3]=Muộn
+     */
+    public Map<Integer, int[]> getAttendanceCountsByStudent(int studentId) {
+        Map<Integer, int[]> map = new HashMap<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery(
+                "SELECT monId, status, COUNT(*) as cnt FROM Attendance WHERE hocSinhId=? GROUP BY monId, status",
+                new String[]{String.valueOf(studentId)}
+        );
+        if (c != null) {
+            while (c.moveToNext()) {
+                int monId = c.getInt(c.getColumnIndexOrThrow("monId"));
+                int status = c.getInt(c.getColumnIndexOrThrow("status"));
+                int cnt = c.getInt(c.getColumnIndexOrThrow("cnt"));
+                int[] arr = map.get(monId);
+                if (arr == null) {
+                    arr = new int[4];
+                    map.put(monId, arr);
+                }
+                if (status >=0 && status < 4) arr[status] = cnt;
+            }
+            c.close();
+        }
+        db.close();
+        return map;
+    }
+
+
+    // ...
+    public List<SubjectAttendance> getAttendanceStatsByStudent(int studentId) {
+        List<SubjectAttendance> list = new ArrayList<>();
+        SQLiteDatabase rdb = getReadableDatabase();
+        String sql = "SELECT a.monId, m.tenMon, a.status, COUNT(*) as cnt " +
+                "FROM Attendance a LEFT JOIN MonHoc m ON a.monId = m.id " +
+                "WHERE a.hocSinhId = ? " +
+                "GROUP BY a.monId, a.status";
+
+        Cursor c = rdb.rawQuery(sql, new String[]{ String.valueOf(studentId) });
+        Map<Integer, SubjectAttendance> map = new LinkedHashMap<>();
+        if (c != null) {
+            while (c.moveToNext()) {
+                int monId = c.getInt(c.getColumnIndexOrThrow("monId"));
+                String tenMon = c.getString(c.getColumnIndexOrThrow("tenMon"));
+                int status = c.getInt(c.getColumnIndexOrThrow("status"));
+                int cnt = c.getInt(c.getColumnIndexOrThrow("cnt"));
+
+                SubjectAttendance sa = map.get(monId);
+                if (sa == null) {
+                    sa = new SubjectAttendance(monId, tenMon);
+                    map.put(monId, sa);
+                }
+
+                switch (status) {
+                    case 0: sa.addPresent(cnt); break;
+                    case 1: sa.addPermitLeave(cnt); break;
+                    case 2: sa.addAbsent(cnt); break;
+                    case 3: sa.addLate(cnt); break;
+                }
+            }
+            c.close();
+        }
+        rdb.close();
+        list.addAll(map.values());
+        return list;
+    }
+
+
+    // Trả về điểm TB theo môn cho 1 HS => List<Pair<tenMon, diemTB>>
+// Mình tạo 1 class nhỏ tạm dưới dạng Map<String,Float> (hoặc bạn có thể tạo model)
+    public List<TwoColumn> getAverageScoresByStudent(int studentId) {
+        List<TwoColumn> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT m.id as monId, m.tenMon as tenMon, AVG(d.diemTB) as avgTB " +
+                "FROM Diem d " +
+                "LEFT JOIN MonHoc m ON d.monId = m.id " +
+                "WHERE d.hocSinhId = ? " +
+                "GROUP BY m.id, m.tenMon";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(studentId)});
+        if (c != null) {
+            while (c.moveToNext()) {
+                TwoColumn t = new TwoColumn();
+                t.setId(c.getInt(c.getColumnIndexOrThrow("monId")));
+                t.setLabel(c.getString(c.getColumnIndexOrThrow("tenMon")));
+                t.setValue((float) c.getDouble(c.getColumnIndexOrThrow("avgTB")));
+                list.add(t);
+            }
+            c.close();
+        }
+        db.close();
+        return list;
+    }
+
 }
 

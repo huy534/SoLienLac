@@ -6,4 +6,5 @@
     <item name="tvGioiTinh" type="id" />
     <item name="tvQueQuan" type="id" />
     <item name="tvMaLop" type="id" />
+    <item name="toolbarBaoCao" type="id" />
 </resources>

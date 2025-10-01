@@ -13,6 +13,8 @@
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- chỉ dùng cho legacy write, khai báo maxSdkVersion để tránh warning trên Android 10+ -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
 
     <application
         android:allowBackup="true"
@@ -63,6 +65,12 @@
     android:exported="false" />
         <activity android:name=".ui.SelectGiaoVienActivity"
             android:exported="false" />
+        <activity android:name=".ui.BaoCaoActivity"
+            android:label="Báo cáo" />
+        <activity android:name=".ui.BaoCaoChuyenCanActivity"
+            android:label="Báo cáo chuyên cần" />
+        <activity android:name=".ui.BaoCaoHocTapActivity"
+            android:label="Báo cáo học tập" />
 <activity android:name=".ui.TaiKhoanActivity"
     android:exported="false" />
         <provider

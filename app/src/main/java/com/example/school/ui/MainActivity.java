@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private DBHelper db;
 
     private TextView tvWelcome;
-    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout, btnTKB, btnTaiKhoan;
+    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout, btnTKB, btnBaoCao, btnTaiKhoan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
         btnUsers = findViewById(R.id.btnUsers);
         btnTKB = findViewById(R.id.btnTKB);
+        btnBaoCao = findViewById(R.id.btnBaoCao);
         btnTaiKhoan = findViewById(R.id.btnTaiKhoan);
 
         int userId = session.getUserId();
@@ -54,12 +55,15 @@ public class MainActivity extends AppCompatActivity {
         }
         if (username == null || username.isEmpty()) username = "Người dùng " + (userId > 0 ? userId : "");
         String roleDisplay = (role == null || role.isEmpty()) ? "user" : role;
-        tvWelcome.setText("Xin chào " + username + " (" + roleDisplay + ")");
+        tvWelcome.setText("Xin chào " + username);
         applyRolePermissions(role);
         btnHocSinh.setOnClickListener(v -> startActivity(new Intent(this, HocSinhActivity.class)));
         btnLopHoc.setOnClickListener(v -> startActivity(new Intent(this, LopHocActivity.class)));
         btnMonHoc.setOnClickListener(v -> startActivity(new Intent(this, MonHocActivity.class)));
         btnDiem.setOnClickListener(v -> startActivity(new Intent(this, DiemActivity.class)));
+
+        btnBaoCao.setOnClickListener(v -> startActivity(new Intent(this, BaoCaoActivity.class)));
+
         if (btnUsers != null) btnUsers.setOnClickListener(v -> startActivity(new Intent(this, com.example.school.ui.UserManagementActivity.class)));
         btnTaiKhoan.setOnClickListener(v -> {
             Intent i = new Intent(MainActivity.this, TaiKhoanActivity.class);
