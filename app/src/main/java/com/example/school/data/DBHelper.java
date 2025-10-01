@@ -10,10 +10,7 @@ import android.util.Log;
 import com.example.school.auth.HashUtils;
 import com.example.school.model.*;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +19,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 24;
+    private static final int DB_VERSION = 26;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -303,7 +300,7 @@ public class DBHelper extends SQLiteOpenHelper {
         outer:
         for (int hsId = 1; hsId <= 27; hsId++) {
             for (int monId = 1; monId <= 6; monId++) {
-                if (inserted >= 50) break outer;
+                if (inserted >= 200) break outer;
                 if (!exists(db, "Diem", "hocSinhId=? AND monId=?", new String[]{String.valueOf(hsId), String.valueOf(monId)})) {
                     float hs1 = 5 + rnd.nextFloat() * 5;
                     float hs2 = 5 + rnd.nextFloat() * 5;
@@ -325,7 +322,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     new Object[]{6, 2, "2025-09-01", 0});
             db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
                     new Object[]{6, 3, "2025-09-01", 3});
-            int[] hocSinhIds = {1, 2, 3, 4, 5, 6}; // danh sách HS
+            int[] hocSinhIds = {1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27}; // danh sách HS
             int[] monIds = {1,2,3,4,5,6}; // danh sách môn
             String ngay = "2025-09-01";
 

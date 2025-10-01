@@ -38,9 +38,7 @@
         <activity
             android:name=".ui.HocSinhActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.AddEditHocSinhActivity"
-            android:exported="false" />
+
         <activity
             android:name=".ui.LopHocActivity"
             android:exported="false" />
@@ -52,8 +50,7 @@
             android:exported="false" />
         <activity android:name=".ui.HocSinhLopActivity"
             android:exported="false" />
-<activity android:name=".ui.MonHocDetailActivity"
-    android:exported="false" />
+
         <activity
             android:name=".ui.UserManagementActivity"
             android:exported="false" />
