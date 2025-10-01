@@ -10,7 +10,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background">
+        android:background="@drawable/background"
+        tools:layout_editor_absoluteX="24dp"
+        tools:layout_editor_absoluteY="56dp">
 
         <ImageView
             android:id="@+id/imageView3"
