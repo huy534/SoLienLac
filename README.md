@@ -4,9 +4,8 @@
 
 1.  **Clone the repository:**
     ```bash
-    git clone <YOUR_REPOSITORY_URL>
+    git clone https://github.com/huy534/SoLienLac.git
     ```
-    Replace `<YOUR_REPOSITORY_URL>` with the actual URL of your GitHub repository.
 
 2.  **Open in Android Studio:**
     *   Open Android Studio.
@@ -18,3 +17,4 @@
     *   Once the Gradle sync is complete, you can build and run the app.
     *   Select an emulator or connect a physical Android device.
     *   Click the "Run" button (the green play icon) in Android Studio, or select "Run" > "Run 'app'" from the menu.
+
