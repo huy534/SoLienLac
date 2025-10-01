@@ -59,7 +59,7 @@ public class DiemActivity extends AppCompatActivity {
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Danh sách điểm");
+            getSupportActionBar().setTitle("Danh sách điểm và nhận xét");
         }
 
         List<Diem> list;
