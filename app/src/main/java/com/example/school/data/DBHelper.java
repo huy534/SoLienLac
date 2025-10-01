@@ -22,7 +22,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 21;
+    private static final int DB_VERSION = 23;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -325,7 +325,22 @@ public class DBHelper extends SQLiteOpenHelper {
                     new Object[]{6, 2, "2025-09-01", 0});
             db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
                     new Object[]{6, 3, "2025-09-01", 3});
-            // ... thêm nhiều dòng để cho thống kê rõ ràng
+            int[] hocSinhIds = {1, 2, 3, 4, 5, 6}; // danh sách HS
+            int[] monIds = {1,2,3,4,5,6}; // danh sách môn
+            String ngay = "2025-09-01";
+
+// status: 1 = có mặt, 0 = vắng, 2 = muộn, 3 = nghỉ có phép (ví dụ)
+            int[] statusOptions = {0, 1, 2, 3};
+
+            for (int hsId : hocSinhIds) {
+                for (int monId : monIds) {
+                    int status = statusOptions[(int)(Math.random() * statusOptions.length)]; // random status
+                    db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
+                            new Object[]{hsId, monId, ngay, status});
+                }
+            }
+
+
         }
 
 
