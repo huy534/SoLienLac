@@ -19,7 +19,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 26;
+    private static final int DB_VERSION = 28;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -312,33 +312,27 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
             }
         }
-        // ví dụ thêm attendance cho HS id = 6 (Do Thi F) với 4 môn (monId 1..4)
-        if (!exists(db, "Attendance", "hocSinhId=? AND monId=?", new String[]{"6","1"})) {
-            db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
-                    new Object[]{6, 1, "2025-09-01", 0});
-            db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
-                    new Object[]{6, 1, "2025-09-02", 1});
-            db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
-                    new Object[]{6, 2, "2025-09-01", 0});
-            db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
-                    new Object[]{6, 3, "2025-09-01", 3});
-            int[] hocSinhIds = {1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27}; // danh sách HS
-            int[] monIds = {1,2,3,4,5,6}; // danh sách môn
-            String ngay = "2025-09-01";
+        String[] dates = {"2025-09-01", "2025-09-02", "2025-09-03"}; // danh sách ngày
+        int[] monIds = {1, 2, 3, 4, 5, 6}; // danh sách môn
+        int[] studentIds = new int[27];
+        for (int i = 0; i < 27; i++) studentIds[i] = i + 1; // id học sinh từ 1 đến 27
 
-// status: 1 = có mặt, 0 = vắng, 2 = muộn, 3 = nghỉ có phép (ví dụ)
-            int[] statusOptions = {0, 1, 2, 3};
-
-            for (int hsId : hocSinhIds) {
-                for (int monId : monIds) {
-                    int status = statusOptions[(int)(Math.random() * statusOptions.length)]; // random status
-                    db.execSQL("INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
-                            new Object[]{hsId, monId, ngay, status});
+        for (int studentId : studentIds) {
+            for (int monId : monIds) {
+                for (String date : dates) {
+                    int status = (int) (Math.random() * 4); // 0,1,2,3 ví dụ trạng thái
+                    // kiểm tra nếu chưa tồn tại
+                    if (!exists(db, "Attendance", "hocSinhId=? AND monId=? AND ngay=?",
+                            new String[]{String.valueOf(studentId), String.valueOf(monId), date})) {
+                        db.execSQL(
+                                "INSERT INTO Attendance (hocSinhId, monId, ngay, status) VALUES (?,?,?,?)",
+                                new Object[]{studentId, monId, date, status}
+                        );
+                    }
                 }
             }
-
-
         }
+
 
 
         // ---------- Parent-Student mapping ----------
