@@ -15,7 +15,7 @@
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="match_parent"
-            android:layout_height="311dp"
+            android:layout_height="301dp"
             app:srcCompat="@drawable/app" />
     </RelativeLayout>
 
@@ -24,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="225dp"
-        android:text="Sổ liên lạc điện tử EduApp"
+        android:text="Sổ liên lạc điện tử SchoolApp"
         android:textAlignment="center"
         android:textSize="22sp"
         android:textStyle="bold"
