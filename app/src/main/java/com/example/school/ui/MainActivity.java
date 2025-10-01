@@ -97,12 +97,14 @@ public class MainActivity extends AppCompatActivity {
                 btnMonHoc.setVisibility(View.VISIBLE);
                 btnDiem.setVisibility(View.VISIBLE);
                 btnUsers.setVisibility(View.VISIBLE);
+                btnBaoCao.setVisibility(View.GONE);
                 break;
             case "giaovien":
                 btnHocSinh.setVisibility(View.GONE);
                 btnLopHoc.setVisibility(View.VISIBLE);
                 btnMonHoc.setVisibility(View.VISIBLE);
                 btnDiem.setVisibility(View.VISIBLE);
+                btnBaoCao.setVisibility(View.GONE);
                 break;
             case "phuhuynh":
                 btnDiem.setVisibility(View.VISIBLE);

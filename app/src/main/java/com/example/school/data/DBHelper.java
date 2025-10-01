@@ -22,7 +22,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 23;
+    private static final int DB_VERSION = 24;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -469,22 +469,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     // Cập nhật user (nếu password rỗng => giữ nguyên)
-    public int updateUser(NguoiDung u) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("tenDangNhap", u.getTenDangNhap());
-        if (u.getMatKhau() != null && !u.getMatKhau().isEmpty()) {
-            // nếu truyền mật khẩu thô thì hash; nếu bạn đã truyền hash sẵn thì bỏ bước này
-            String hashed = HashUtils.sha256(u.getMatKhau());
-            cv.put("matKhau", hashed);
-        }
-        cv.put("vaiTro", u.getVaiTro());
-        cv.put("email", u.getEmail());
-        cv.put("sdt", u.getSdt());
-        int rows = db.update("NguoiDung", cv, "id=?", new String[]{String.valueOf(u.getId())});
-        db.close();
-        return rows;
-    }
+
 
     // Xóa user (trả về số rows)
     public int deleteUser(int id) {
@@ -493,17 +478,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return rows;
     }
-
-    // Kiểm tra username đã tồn tại khác id hiện tại (dùng khi edit để tránh trùng với bản ghi khác)
-    public boolean usernameExistsOtherThan(String username, int excludeId) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT id FROM NguoiDung WHERE tenDangNhap=? AND id<>?", new String[]{username, String.valueOf(excludeId)});
-        boolean ex = c != null && c.moveToFirst();
-        if (c != null) c.close();
-        db.close();
-        return ex;
-    }
-
     // ----------------- MonHoc -----------------
     public long insertMonHoc(MonHoc mh) {
         SQLiteDatabase db = getWritableDatabase();
@@ -722,29 +696,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return d;
     }
-
-    public List<Diem> getDiemByStudent(int studentId) {
-        List<Diem> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM Diem WHERE hocSinhId=?", new String[]{String.valueOf(studentId)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(new Diem(
-                        c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
-                        c.getInt(c.getColumnIndexOrThrow("monId")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemThi")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemTB")),
-                        c.getString(c.getColumnIndexOrThrow("nhanXet"))
-                ));
-            }
-            c.close();
-        }
-        db.close();
-        return list;
-    }
-
     // Get Diem rows for parent (students mapped)
     public List<Diem> getDiemByParent(int parentUserId) {
         List<Diem> list = new ArrayList<>();
@@ -769,64 +720,6 @@ public class DBHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // Lấy lớp mà giáo viên chủ nhiệm
-
-
-    // Lấy danh sách học sinh trong lớp giáo viên chủ nhiệm
-    public List<HocSinh> getHocSinhByTeacherClass(int teacherId) {
-        List<HocSinh> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery(
-                "SELECT hs.* FROM HocSinh hs " +
-                        "JOIN LopHoc l ON hs.maLop = l.id " +
-                        "WHERE l.gvcn=?",
-                new String[]{String.valueOf(teacherId)});
-        if (c.moveToFirst()) {
-            do {
-                list.add(new HocSinh(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("hoTen")),
-                        c.getString(c.getColumnIndexOrThrow("ngaySinh")),
-                        c.getString(c.getColumnIndexOrThrow("gioiTinh")),
-                        c.getString(c.getColumnIndexOrThrow("queQuan")),
-                        c.getInt(c.getColumnIndexOrThrow("maLop"))
-                ));
-            } while (c.moveToNext());
-        }
-        c.close();
-        return list;
-    }
-
-    // Lấy điểm của HS theo môn mà giáo viên dạy
-    public List<Diem> getDiemByTeacherSubject(int teacherId) {
-        List<Diem> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery(
-                "SELECT d.*, hs.hoTen, m.tenMon " +
-                        "FROM Diem d " +
-                        "JOIN HocSinh hs ON d.hocSinhId = hs.id " +
-                        "JOIN MonHoc m ON d.monId = m.id " +
-                        "WHERE m.teacherId=?",
-                new String[]{String.valueOf(teacherId)});
-        if (c.moveToFirst()) {
-            do {
-                Diem d = new Diem(
-                        c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
-                        c.getInt(c.getColumnIndexOrThrow("monId")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemThi")),
-                        c.getFloat(c.getColumnIndexOrThrow("diemTB")),
-                        c.getString(c.getColumnIndexOrThrow("nhanXet"))
-                );
-                d.setTenHocSinh(c.getString(c.getColumnIndexOrThrow("hoTen")));
-                d.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
-                list.add(d);
-            } while (c.moveToNext());
-        }
-        c.close();
-        return list;
-    }
 
     // Update điểm chi tiết (gồm nhận xét & điểm danh)
     public int updateDiemChiTiet(int hocSinhId, int monId, float hs1, float hs2, float thi, String nhanXet) {
@@ -1072,89 +965,6 @@ public class DBHelper extends SQLiteOpenHelper {
     /**
      * Get TKB for a specific class (useful for admin to view class schedules)
      */
-    public List<TKB> getTKBByClass(int maLop) {
-        List<TKB> list = new ArrayList<>();
-        SQLiteDatabase rdb = getReadableDatabase();
-        String sql = "SELECT t.id, t.maLop, t.maMon, t.thu, t.tiet, m.tenMon as tenMon, l.tenLop as tenLop, n.tenDangNhap as tenGv " +
-                "FROM TKB t " +
-                "LEFT JOIN MonHoc m ON t.maMon = m.id " +
-                "LEFT JOIN LopHoc l ON t.maLop = l.id " +
-                "LEFT JOIN NguoiDung n ON m.teacherId = n.id " +
-                "WHERE t.maLop = ? ORDER BY t.thu, t.tiet";
-        Cursor c = rdb.rawQuery(sql, new String[]{String.valueOf(maLop)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                TKB t = new TKB();
-                t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
-                t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
-                t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
-                t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
-                t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
-                try {
-                    t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
-                } catch (Exception ignored) {
-                }
-                try {
-                    t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
-                } catch (Exception ignored) {
-                }
-                try {
-                    t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv")));
-                } catch (Exception ignored) {
-                }
-                list.add(t);
-            }
-            c.close();
-        }
-        rdb.close();
-        return list;
-    }
-
-
-    // helper lấy tên lớp / tên môn khi cần
-    public String getLopNameById(int id) {
-        String s = "";
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT tenLop FROM LopHoc WHERE id=?", new String[]{String.valueOf(id)});
-        if (c != null && c.moveToFirst()) {
-            s = c.getString(0);
-            c.close();
-        }
-        db.close();
-        return s;
-    }
-
-    public String getMonNameById(int id) {
-        String s = "";
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT tenMon FROM MonHoc WHERE id=?", new String[]{String.valueOf(id)});
-        if (c != null && c.moveToFirst()) {
-            s = c.getString(0);
-            c.close();
-        }
-        db.close();
-        return s;
-    }
-
-    public List<TKB> getTKBByLop(int maLop) {
-        List<TKB> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM TKB WHERE maLop=?", new String[]{String.valueOf(maLop)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(new TKB(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getInt(c.getColumnIndexOrThrow("maLop")),
-                        c.getInt(c.getColumnIndexOrThrow("maMon")),
-                        c.getInt(c.getColumnIndexOrThrow("thu")),
-                        c.getInt(c.getColumnIndexOrThrow("tiet"))
-                ));
-            }
-            c.close();
-        }
-        db.close();
-        return list;
-    }
 
     // ----------------- LopHoc -----------------
     public List<LopHoc> getAllLopHoc() {
@@ -1472,33 +1282,6 @@ public class DBHelper extends SQLiteOpenHelper {
     /**
      * Trả về Map<monId, int[4]>: counts[0]=Có mặt, [1]=Vắng có phép, [2]=Vắng không phép, [3]=Muộn
      */
-    public Map<Integer, int[]> getAttendanceCountsByStudent(int studentId) {
-        Map<Integer, int[]> map = new HashMap<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery(
-                "SELECT monId, status, COUNT(*) as cnt FROM Attendance WHERE hocSinhId=? GROUP BY monId, status",
-                new String[]{String.valueOf(studentId)}
-        );
-        if (c != null) {
-            while (c.moveToNext()) {
-                int monId = c.getInt(c.getColumnIndexOrThrow("monId"));
-                int status = c.getInt(c.getColumnIndexOrThrow("status"));
-                int cnt = c.getInt(c.getColumnIndexOrThrow("cnt"));
-                int[] arr = map.get(monId);
-                if (arr == null) {
-                    arr = new int[4];
-                    map.put(monId, arr);
-                }
-                if (status >=0 && status < 4) arr[status] = cnt;
-            }
-            c.close();
-        }
-        db.close();
-        return map;
-    }
-
-
-    // ...
     public List<SubjectAttendance> getAttendanceStatsByStudent(int studentId) {
         List<SubjectAttendance> list = new ArrayList<>();
         SQLiteDatabase rdb = getReadableDatabase();
@@ -1538,7 +1321,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     // Trả về điểm TB theo môn cho 1 HS => List<Pair<tenMon, diemTB>>
-// Mình tạo 1 class nhỏ tạm dưới dạng Map<String,Float> (hoặc bạn có thể tạo model)
     public List<TwoColumn> getAverageScoresByStudent(int studentId) {
         List<TwoColumn> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
