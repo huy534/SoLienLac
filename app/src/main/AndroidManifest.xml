@@ -42,16 +42,17 @@
         <activity
             android:name=".ui.LopHocActivity"
             android:exported="false" />
+        <activity android:name=".ui.HocSinhLopActivity"
+            android:exported="false" />
+        <activity android:name=".ui.HocSinhByLopActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.MonHocActivity"
             android:exported="false" />
         <activity
             android:name=".ui.DiemActivity"
             android:exported="false" />
-        <activity android:name=".ui.HocSinhLopActivity"
-            android:exported="false" />
-
-        <activity
+                <activity
             android:name=".ui.UserManagementActivity"
             android:exported="false" />
 <activity android:name=".ui.TKBActivity"

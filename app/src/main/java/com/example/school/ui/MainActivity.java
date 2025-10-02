@@ -122,10 +122,10 @@ public class MainActivity extends AppCompatActivity {
                 // Admin: chọn loại TKB (HS / GV)
                 startActivity(new Intent(this, ChooseTKBActivity.class));
             } else if (rl.equals("giaovien")) {
-                // Giáo viên: vào trực tiếp TKB của chính mình
-                startActivity(new Intent(this, TKBActivity.class)
-                        .putExtra("type", "giaovien")
-                        .putExtra("id", userId));
+                Intent i = new Intent(this, TKBActivity.class);
+                i.putExtra("mode", "teacher");
+                i.putExtra("id", session.getUserId());
+                startActivity(i);
             } else if (rl.equals("phuhuynh")) {
                 // Phụ huynh: vào trực tiếp TKB của con
                 startActivity(new Intent(this, TKBActivity.class)

@@ -19,7 +19,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 28;
+    private static final int DB_VERSION = 29;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -566,29 +566,13 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return m;
     }
-
-    // Students in a subject (unique HS that have Diem record for that mon)
-    public List<HocSinh> getStudentsByMon(int monId) {
-        List<HocSinh> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery(
-                "SELECT DISTINCT hs.* FROM HocSinh hs JOIN Diem d ON hs.id = d.hocSinhId WHERE d.monId = ?",
-                new String[]{String.valueOf(monId)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(new HocSinh(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("hoTen")),
-                        c.getString(c.getColumnIndexOrThrow("ngaySinh")),
-                        c.getString(c.getColumnIndexOrThrow("gioiTinh")),
-                        c.getString(c.getColumnIndexOrThrow("queQuan")),
-                        c.getInt(c.getColumnIndexOrThrow("maLop"))
-                ));
-            }
-            c.close();
-        }
-        db.close();
-        return list;
+    public boolean isTeacherTeachesSubject(int teacherId, int monId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT 1 FROM MonHoc WHERE id=? AND gvPhuTrachId=?",
+                new String[]{String.valueOf(monId), String.valueOf(teacherId)});
+        boolean exists = c.moveToFirst();
+        c.close();
+        return exists;
     }
 
     // ---------------- HOC SINH ----------------
@@ -668,25 +652,6 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Diem getDiemByStudentAndMon(int studentId, int monId) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM Diem WHERE hocSinhId=? AND monId=?", new String[]{String.valueOf(studentId), String.valueOf(monId)});
-        Diem d = null;
-        if (c != null && c.moveToFirst()) {
-            d = new Diem(
-                    c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
-                    c.getInt(c.getColumnIndexOrThrow("monId")),
-                    c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
-                    c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
-                    c.getFloat(c.getColumnIndexOrThrow("diemThi")),
-                    c.getFloat(c.getColumnIndexOrThrow("diemTB")),
-                    c.getString(c.getColumnIndexOrThrow("nhanXet"))
-            );
-            c.close();
-        } else if (c != null) c.close();
-        db.close();
-        return d;
-    }
     // Get Diem rows for parent (students mapped)
     public List<Diem> getDiemByParent(int parentUserId) {
         List<Diem> list = new ArrayList<>();
@@ -713,17 +678,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     // Update điểm chi tiết (gồm nhận xét & điểm danh)
-    public int updateDiemChiTiet(int hocSinhId, int monId, float hs1, float hs2, float thi, String nhanXet) {
-        float tb = computeTB(hs1, hs2, thi);
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("diemHS1", hs1);
-        cv.put("diemHS2", hs2);
-        cv.put("diemThi", thi);
-        cv.put("diemTB", tb);
-        cv.put("nhanXet", nhanXet);
-        return db.update("Diem", cv, "hocSinhId=? AND monId=?", new String[]{String.valueOf(hocSinhId), String.valueOf(monId)});
-    }
+
 
     // Diem by teacher (students in classes teacher is gvcn)
     public List<Diem> getDiemByTeacher(int teacherId) {
@@ -768,18 +723,6 @@ public class DBHelper extends SQLiteOpenHelper {
             db.close();
             return id;
         }
-    }
-
-    public int getAttendanceStatus(int hocSinhId, int monId, String ngay) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT status FROM Attendance WHERE hocSinhId=? AND monId=? AND ngay=?", new String[]{String.valueOf(hocSinhId), String.valueOf(monId), ngay});
-        int status = -1;
-        if (c != null && c.moveToFirst()) {
-            status = c.getInt(c.getColumnIndexOrThrow("status"));
-            c.close();
-        } else if (c != null) c.close();
-        db.close();
-        return status;
     }
 
     // ----------------- TKB -----------------
@@ -979,26 +922,19 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
-
-    public LopHoc getLopHocById(int id) {
+    public String getLopNameById(int id) {
+        String s = "";
         SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT l.*, n.tenDangNhap as gvName FROM LopHoc l LEFT JOIN NguoiDung n ON l.gvcn = n.id WHERE l.id=?", new String[]{String.valueOf(id)});
-        LopHoc l = null;
+        Cursor c = db.rawQuery("SELECT tenLop FROM LopHoc WHERE id=?", new String[]{String.valueOf(id)});
         if (c != null && c.moveToFirst()) {
-            l = new LopHoc(
-                    c.getInt(c.getColumnIndexOrThrow("id")),
-                    c.getString(c.getColumnIndexOrThrow("tenLop")),
-                    c.getString(c.getColumnIndexOrThrow("khoi")),
-                    c.getString(c.getColumnIndexOrThrow("namHoc")),
-                    c.getInt(c.getColumnIndexOrThrow("siSo")),
-                    c.getInt(c.getColumnIndexOrThrow("gvcn"))
-            );
+            s = c.getString(0);
             c.close();
-        } else if (c != null) c.close();
+        } else if (c != null) {
+            c.close();
+        }
         db.close();
-        return l;
+        return s;
     }
-
     // ----------------- Parent mapping -----------------
     public long assignStudentToParent(int userId, int studentId) {
         SQLiteDatabase db = getWritableDatabase();

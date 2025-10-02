@@ -1,5 +1,6 @@
 package com.example.school.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -18,13 +19,14 @@ import com.example.school.model.LopHoc;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class LopHocActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private FloatingActionButton fabAdd;
-    private List<LopHoc> list;
+    private List<LopHoc> list = new ArrayList<>();
     private LopHocAdapter adapter;
     private DBHelper db;
     private SessionManager session;
@@ -40,40 +42,49 @@ public class LopHocActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewLopHoc);
         fabAdd = findViewById(R.id.fabAddLopHoc);
 
-        String role = session.getUserRole();
+        // role xử lý (lưu ý: SessionManager lưu role thường là lower-case "giaovien")
+        String role = session.getUserRole() == null ? "" : session.getUserRole().toLowerCase(Locale.getDefault());
         int userId = session.getUserId();
+
+        boolean isAdmin = role.contains("admin");
+        boolean isGiaoVien = role.contains("giaovien");
+
         MaterialToolbar toolbar = findViewById(R.id.toolbarLopHoc);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (toolbar != null) {
+            toolbar.setTitle("Danh sách lớp học");
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(v -> finish());
         }
-        toolbar.setNavigationOnClickListener(v -> finish());
-        toolbar.setTitle("Danh sách lớp học");
-        if ("GiaoVien".equalsIgnoreCase(role)) {
-            // teacher: see only their classes; optionally disable add
-            list = db.getLopByTeacher(userId);
-            fabAdd.setVisibility(View.GONE); // or allow creation per policy
-            adapter = new LopHocAdapter(list, lop -> {
-                // long click delete only if gvcn == userId
-                if (lop.getGvcn() == userId) {
-                    new AlertDialog.Builder(this)
-                            .setTitle("Xóa lớp")
-                            .setMessage("Bạn có chắc muốn xóa " + lop.getTenLop() + " ?")
-                            .setPositiveButton("Xóa", (d, w) -> {
-                                db.deleteLopHoc(lop.getId());
-                                refresh();
-                            })
-                            .setNegativeButton("Hủy", null)
-                            .show();
-                } else {
-                    Toast.makeText(this, "Bạn không có quyền xóa lớp này", Toast.LENGTH_SHORT).show();
-                }
-            });
+
+        // load dữ liệu tuỳ role
+        if (isGiaoVien) {
+            list.clear();
+            list.addAll(db.getLopByTeacher(userId));
+            if (fabAdd != null) fabAdd.setVisibility(View.GONE); // GV ko được thêm lớp
         } else {
-            // admin/others: see all
-            list = db.getAllLopHoc();
-            adapter = new LopHocAdapter(list, lop -> {
-                new AlertDialog.Builder(this)
+            list.clear();
+            list.addAll(db.getAllLopHoc());
+            if (fabAdd != null) fabAdd.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+        }
+
+        // khởi tạo adapter
+        adapter = new LopHocAdapter(list); // <-- nếu adapter của bạn có constructor khác, điều chỉnh ở đây
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        // click: mở chi tiết lớp (bạn có thể chuyển đến Activity hiển thị HS theo lớp)
+        adapter.setOnItemClickListener(lop -> {
+            Intent i = new Intent(LopHocActivity.this, com.example.school.ui.HocSinhByLopActivity.class);
+            i.putExtra("maLop", lop.getId());
+            startActivity(i);
+        });
+
+        // long click: chỉ admin / (gv: chỉ lớp gvcn của họ đã lọc) -> cho xem danh sách HS hoặc xóa nếu admin
+        adapter.setOnItemLongClickListener(lop -> {
+            if (isAdmin) {
+                // admin: show edit/delete dialog (ví dụ xóa)
+                new AlertDialog.Builder(LopHocActivity.this)
                         .setTitle("Xóa lớp")
                         .setMessage("Bạn có chắc muốn xóa " + lop.getTenLop() + " ?")
                         .setPositiveButton("Xóa", (d, w) -> {
@@ -82,26 +93,38 @@ public class LopHocActivity extends AppCompatActivity {
                         })
                         .setNegativeButton("Hủy", null)
                         .show();
+            } else {
+                // non-admin: long click -> mở danh sách HS lớp (xem) (GV sẽ chỉ thấy lớp mình do list đã lọc)
+                Intent i = new Intent(LopHocActivity.this, com.example.school.ui.HocSinhByLopActivity.class);
+                i.putExtra("maLop", lop.getId());
+                startActivity(i);
+            }
+        });
+
+        // fab: chỉ admin được thêm
+        if (fabAdd != null) {
+            fabAdd.setOnClickListener(v -> {
+                if (!isAdmin) {
+                    Toast.makeText(LopHocActivity.this, "Bạn không có quyền thêm lớp", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                showAddEditDialog(null);
             });
-            fabAdd.setOnClickListener(v -> showAddEditDialog(null));
         }
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
         refresh();
     }
 
     private void refresh() {
-        String role = session.getUserRole();
+        String role = session.getUserRole() == null ? "" : session.getUserRole().toLowerCase(Locale.getDefault());
         int userId = session.getUserId();
-
         list.clear();
-        if ("GiaoVien".equalsIgnoreCase(role)) {
+        if (role.contains("giaovien")) {
             list.addAll(db.getLopByTeacher(userId));
         } else {
             list.addAll(db.getAllLopHoc());
         }
-        adapter.notifyDataSetChanged();
+        adapter.updateData(list); // giả sử adapter có method updateData(List<LopHoc>)
         findViewById(R.id.tvEmptyLopHoc).setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
