@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarThongBaoDetail"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:titleTextColor="@android:color/white"
+        app:layout_scrollFlags="scroll|enterAlways"/>
+
+    <TextView
+        android:id="@+id/tvTB_Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tiêu đề"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tvTB_Sender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Gửi từ: Admin"
+        android:layout_marginTop="8dp"/>
+    <TextView
+        android:id="@+id/tvTB_Target"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"/>
+    <TextView
+        android:id="@+id/tvTB_Time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="2025-10-02 10:30"
+        android:layout_marginTop="4dp"
+        android:textSize="12sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ddd"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tvTB_Content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Nội dung thông báo chi tiết..."
+        android:textSize="15sp"/>
+
+    <Button
+        android:id="@+id/btnTB_Delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xóa thông báo"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="@android:color/holo_red_light"/>
+</LinearLayout>

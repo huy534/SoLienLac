@@ -104,7 +104,12 @@
                             android:layout_height="wrap_content"
                             android:text="Báo cáo"
                             android:layout_marginTop="8dp"/>
-
+                        <Button
+                            android:id="@+id/btnThongBao"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Thông báo"
+                            android:layout_marginTop="8dp"/>
                         <Button
                             android:id="@+id/btnTaiKhoan"
                             android:layout_width="match_parent"

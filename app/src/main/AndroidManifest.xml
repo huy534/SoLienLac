@@ -71,6 +71,13 @@
             android:label="Báo cáo học tập" />
 <activity android:name=".ui.TaiKhoanActivity"
     android:exported="false" />
+        <activity android:name=".ui.ThongBaoListActivity"
+            android:exported="false" />
+<activity android:name=".ui.ThongBaoChooseActivity"
+    android:exported="false" />
+<activity android:name=".ui.ThongBaoDetailActivity"
+    android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

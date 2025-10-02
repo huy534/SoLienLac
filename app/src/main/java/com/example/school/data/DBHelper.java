@@ -19,7 +19,32 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 29;
+    private static final int DB_VERSION = 47; // tăng khi thay đổi cấu trúc
+    private Diem buildDiemFromCursor(Cursor c) {
+        Diem d = new Diem(
+                c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
+                c.getInt(c.getColumnIndexOrThrow("monId")),
+                c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
+                c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
+                c.getFloat(c.getColumnIndexOrThrow("diemThi")),
+                c.getFloat(c.getColumnIndexOrThrow("diemTB")),
+                c.getString(c.getColumnIndexOrThrow("nhanXet"))
+        );
+        // set hiển thị
+        if (hasColumn(c, "tenHocSinh")) d.setTenHocSinh(c.getString(c.getColumnIndexOrThrow("tenHocSinh")));
+        if (hasColumn(c, "tenMon")) d.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
+        if (hasColumn(c, "tenLop")) d.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
+        return d;
+    }
+
+        // helper an toàn để tránh exception nếu cột không t��n tại
+    private boolean hasColumn(Cursor cursor, String columnName) {
+        try {
+            return cursor.getColumnIndex(columnName) != -1;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -116,6 +141,18 @@ public class DBHelper extends SQLiteOpenHelper {
                 "userId INTEGER," +
                 "studentId INTEGER," +
                 "UNIQUE(userId, studentId))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS ThongBao (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "guiTu TEXT," +
+                "tieuDe TEXT," +
+                "noiDung TEXT," +
+                "thoiGian TEXT," +
+                "targetRole TEXT," +   // <== thêm dòng này
+                "senderRole TEXT," +   // <== và dòng này
+                "targetUserId INTEGER" // nếu cần thông báo cá nhân
+                + ")");
+
+
 
         // Seed dữ liệu mẫu an toàn
         seedData(db);
@@ -132,9 +169,9 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS Attendance");
         db.execSQL("DROP TABLE IF EXISTS TKB");
         db.execSQL("DROP TABLE IF EXISTS ParentStudent");
+        db.execSQL("DROP TABLE IF EXISTS ThongBao"); // <- ensure ThongBao is dropped so new schema is created
         onCreate(db);
     }
-
     // ----------------- Seed helpers -----------------
     private boolean exists(SQLiteDatabase db, String table, String whereClause, String[] whereArgs) {
         Cursor c = db.rawQuery("SELECT 1 FROM " + table + " WHERE " + whereClause + " LIMIT 1", whereArgs);
@@ -277,6 +314,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
             }
         }
+           db.execSQL("INSERT INTO ThongBao(guiTu, tieuDe, noiDung, thoiGian, senderRole, targetRole, targetUserId) VALUES " +
+                "('admin', 'Lịch họp', 'Tất cả giáo viên họp chiều thứ 2.', '2025-10-02 09:00:00', 'admin', 'giaovien', NULL)," +
+                "('admin', 'Thông báo nghỉ học', 'Toàn trường nghỉ học ngày 3/10.', '2025-10-02 10:00:00', 'admin', 'all', NULL)," +
+                "('admin', 'Phân công coi thi', 'Danh sách phân công coi thi đã được gửi.', '2025-10-01 14:30:00', 'admin', 'giaovien', NULL)," +
+                "('admin', 'Hoạt động', 'Các học sinh sẽ tham gia hoạt động ngoại khóa vào ngày 10/10.', '2025-10-01 08:45:00', 'admin', 'phuhuynh', NULL);");
+
         // ---------- MON HOC ----------
         Object[][] monHocArr = {
                 {"Toán", 4, idGvToan},
@@ -675,27 +718,21 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return list;
     }
-
-
-    // Update điểm chi tiết (gồm nhận xét & điểm danh)
-
-
-    // Diem by teacher (students in classes teacher is gvcn)
-    public List<Diem> getDiemByTeacher(int teacherId) {
+    // Diem by teacher
+    public List<Diem> getDiemByTeacher(int gvId) {
         List<Diem> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(
-                "SELECT d.*, hs.hoTen, l.tenLop, m.tenMon " +
-                        "FROM Diem d " +
-                        "JOIN HocSinh hs ON d.hocSinhId = hs.id " +
-                        "JOIN LopHoc l ON hs.maLop = l.id " +
-                        "JOIN MonHoc m ON d.monId = m.id " +
-                        "WHERE l.gvcn = ? OR m.teacherId = ?",
-                new String[]{String.valueOf(teacherId), String.valueOf(teacherId)}
-        );
+        String sql = "SELECT d.*, hs.hoTen AS tenHocSinh, l.tenLop AS tenLop, m.tenMon AS tenMon " +
+                "FROM Diem d " +
+                "JOIN HocSinh hs ON d.hocSinhId = hs.id " +
+                "JOIN LopHoc l ON hs.maLop = l.id " +
+                "JOIN MonHoc m ON d.monId = m.id " +
+                "WHERE m.teacherId = ? " +
+                "ORDER BY hs.hoTen";
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(gvId)});
         if (c != null) {
             while (c.moveToNext()) {
-                Diem d = buildDiemFromCursor(c);
+                Diem d = buildDiemFromCursor(c); // dùng helper
                 list.add(d);
             }
             c.close();
@@ -703,7 +740,24 @@ public class DBHelper extends SQLiteOpenHelper {
         return list;
     }
 
+
     // ----------------- Attendance -----------------
+    public String getAttendanceStatus(int hocSinhId, int monId, String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "SELECT status FROM Attendance WHERE hocSinhId=? AND monId=? AND ngay=?";
+        Cursor c = db.rawQuery(sql, new String[]{
+                String.valueOf(hocSinhId),
+                String.valueOf(monId),
+                date
+        });
+        String result = "Vắng không phép"; // default
+        if (c.moveToFirst()) {
+            result = c.getString(0);
+        }
+        c.close();
+        return result;
+    }
+
     public long markAttendance(int hocSinhId, int monId, String ngay, int status) {
         SQLiteDatabase db = getWritableDatabase();
         // update if exists
@@ -1112,23 +1166,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return rows;
     }
-
-    private Diem buildDiemFromCursor(Cursor c) {
-        Diem d = new Diem(
-                c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
-                c.getInt(c.getColumnIndexOrThrow("monId")),
-                c.getFloat(c.getColumnIndexOrThrow("diemHS1")),
-                c.getFloat(c.getColumnIndexOrThrow("diemHS2")),
-                c.getFloat(c.getColumnIndexOrThrow("diemThi")),
-                c.getFloat(c.getColumnIndexOrThrow("diemTB")),
-                c.getString(c.getColumnIndexOrThrow("nhanXet"))
-        );
-        d.setTenHocSinh(c.getString(c.getColumnIndexOrThrow("hoTen")));
-        d.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
-        d.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
-        return d;
-    }
-
     // Lấy thông tin người dùng theo id
     public NguoiDung getUserById(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -1270,6 +1307,133 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
+    // insert
+    public long insertThongBao(ThongBao tb) {
+        SQLiteDatabase wdb = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("guiTu", tb.getGuiTu());
+        cv.put("tieuDe", tb.getTieuDe());
+        cv.put("noiDung", tb.getNoiDung());
+        cv.put("thoiGian", tb.getThoiGian());
+        cv.put("targetRole", tb.getTargetRole());
+        if (tb.getSenderRole() != null) cv.put("senderRole", tb.getSenderRole());
+        long id = wdb.insert("ThongBao", null, cv);
+        wdb.close();
+        return id;
+    }
 
+    public int deleteThongBao(int id) {
+        SQLiteDatabase wdb = getWritableDatabase();
+        int rows = wdb.delete("ThongBao", "id=?", new String[]{String.valueOf(id)});
+        wdb.close();
+        return rows;
+    }
+
+    public List<ThongBao> getAllThongBao() {
+        List<ThongBao> list = new ArrayList<>();
+        SQLiteDatabase rdb = getReadableDatabase();
+        Cursor c = rdb.rawQuery("SELECT * FROM ThongBao ORDER BY thoiGian DESC", null);
+        if (c != null) {
+            while (c.moveToNext()) {
+                ThongBao tb = new ThongBao(
+                        c.getInt(c.getColumnIndexOrThrow("id")),
+                        c.getString(c.getColumnIndexOrThrow("guiTu")),
+                        c.getString(c.getColumnIndexOrThrow("tieuDe")),
+                        c.getString(c.getColumnIndexOrThrow("noiDung")),
+                        c.getString(c.getColumnIndexOrThrow("thoiGian")),
+                        c.getString(c.getColumnIndexOrThrow("targetRole")),
+                        c.getString(c.getColumnIndexOrThrow("senderRole"))
+                );
+                list.add(tb);
+            }
+            c.close();
+        }
+        rdb.close();
+        return list;
+    }
+
+    public List<ThongBao> getThongBaoByTarget(String targetRole) {
+        List<ThongBao> list = new ArrayList<>();
+        SQLiteDatabase rdb = getReadableDatabase();
+        Cursor c = rdb.rawQuery("SELECT * FROM ThongBao WHERE targetRole=? OR targetRole='all' ORDER BY thoiGian DESC", new String[]{targetRole});
+        if (c != null) {
+            while (c.moveToNext()) {
+                ThongBao tb = new ThongBao(
+                        c.getInt(c.getColumnIndexOrThrow("id")),
+                        c.getString(c.getColumnIndexOrThrow("guiTu")),
+                        c.getString(c.getColumnIndexOrThrow("tieuDe")),
+                        c.getString(c.getColumnIndexOrThrow("noiDung")),
+                        c.getString(c.getColumnIndexOrThrow("thoiGian")),
+                        c.getString(c.getColumnIndexOrThrow("targetRole")),
+                        c.getString(c.getColumnIndexOrThrow("senderRole"))
+                );
+                list.add(tb);
+            }
+            c.close();
+        }
+        rdb.close();
+        return list;
+    }
+
+    /**
+     * Lấy thông báo mà user có quyền xem:
+     * - targetRole == 'all'
+     * - OR targetRole == role (phuhuynh/giaovien)
+     * - OR targetUserId == userId (direct)
+     */
+    public List<ThongBao> getThongBaoForUser(int userId) {
+        List<ThongBao> list = new ArrayList<>();
+        // lấy role của user
+        String role = "";
+        SQLiteDatabase rdb = getReadableDatabase();
+        Cursor rc = rdb.rawQuery("SELECT vaiTro FROM NguoiDung WHERE id=?", new String[]{String.valueOf(userId)});
+        if (rc != null && rc.moveToFirst()) {
+            role = rc.getString(0);
+            rc.close();
+        }
+        if (role == null) role = "";
+        role = role.toLowerCase();
+
+        Cursor c = rdb.rawQuery(
+                "SELECT * FROM ThongBao WHERE targetRole='all' OR targetRole=? OR targetUserId=? ORDER BY thoiGian DESC",
+                new String[]{role, String.valueOf(userId)}
+        );
+        if (c != null) {
+            while (c.moveToNext()) {
+                ThongBao tb = new ThongBao(
+                        c.getInt(c.getColumnIndexOrThrow("id")),
+                        c.getString(c.getColumnIndexOrThrow("guiTu")),
+                        c.getString(c.getColumnIndexOrThrow("tieuDe")),
+                        c.getString(c.getColumnIndexOrThrow("noiDung")),
+                        c.getString(c.getColumnIndexOrThrow("thoiGian")),
+                        c.getString(c.getColumnIndexOrThrow("targetRole")),
+                        c.getString(c.getColumnIndexOrThrow("senderRole"))
+                );
+                list.add(tb);
+            }
+            c.close();
+        }
+        rdb.close();
+        return list;
+    }
+    public ThongBao getThongBaoById(int id) {
+        SQLiteDatabase rdb = getReadableDatabase();
+        Cursor c = rdb.rawQuery("SELECT id, guiTu, targetRole, tieuDe, noiDung, thoiGian FROM ThongBao WHERE id=?", new String[]{String.valueOf(id)});
+        ThongBao tb = null;
+        if (c != null && c.moveToFirst()) {
+            tb = new ThongBao(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("guiTu")),
+                    c.getString(c.getColumnIndexOrThrow("targetRole")),
+                    c.getString(c.getColumnIndexOrThrow("tieuDe")),
+                    c.getString(c.getColumnIndexOrThrow("noiDung")),
+                    c.getString(c.getColumnIndexOrThrow("thoiGian")),
+                    c.getString(c.getColumnIndexOrThrow("senderRole"))
+            );
+            c.close();
+        } else if (c != null) c.close();
+        rdb.close();
+        return tb;
+    }
 }
 

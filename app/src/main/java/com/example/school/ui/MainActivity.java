@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private DBHelper db;
 
     private TextView tvWelcome;
-    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout, btnTKB, btnBaoCao, btnTaiKhoan;
+    private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout, btnTKB, btnBaoCao, btnThongBao, btnTaiKhoan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         btnUsers = findViewById(R.id.btnUsers);
         btnTKB = findViewById(R.id.btnTKB);
         btnBaoCao = findViewById(R.id.btnBaoCao);
+        btnThongBao = findViewById(R.id.btnThongBao);
         btnTaiKhoan = findViewById(R.id.btnTaiKhoan);
 
         int userId = session.getUserId();
@@ -133,7 +134,17 @@ public class MainActivity extends AppCompatActivity {
                         .putExtra("id", userId));
             }
         });
-
+        btnThongBao.setOnClickListener(v -> {
+            String r = session.getUserRole();
+            if ("admin".equalsIgnoreCase(r)) {
+                // admin chọn gửi cho GV hay PH -> open choose activity
+                startActivity(new Intent(this, ThongBaoChooseActivity.class));
+            } else if ("giaovien".equalsIgnoreCase(r)) {
+                startActivity(new Intent(this, ThongBaoListActivity.class).putExtra("targetRole","giaovien"));
+            } else if ("phuhuynh".equalsIgnoreCase(r)) {
+                startActivity(new Intent(this, ThongBaoListActivity.class).putExtra("targetRole","phuhuynh"));
+            }
+        });
     }
 
     @Override
