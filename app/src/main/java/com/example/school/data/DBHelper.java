@@ -37,7 +37,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return d;
     }
 
-        // helper an toàn để tránh exception nếu cột không t��n tại
+    // helper an toàn để tránh exception nếu cột không t��n tại
     private boolean hasColumn(Cursor cursor, String columnName) {
         try {
             return cursor.getColumnIndex(columnName) != -1;
@@ -314,7 +314,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
             }
         }
-           db.execSQL("INSERT INTO ThongBao(guiTu, tieuDe, noiDung, thoiGian, senderRole, targetRole, targetUserId) VALUES " +
+        db.execSQL("INSERT INTO ThongBao(guiTu, tieuDe, noiDung, thoiGian, senderRole, targetRole, targetUserId) VALUES " +
                 "('admin', 'Lịch họp', 'Tất cả giáo viên họp chiều thứ 2.', '2025-10-02 09:00:00', 'admin', 'giaovien', NULL)," +
                 "('admin', 'Thông báo nghỉ học', 'Toàn trường nghỉ học ngày 3/10.', '2025-10-02 10:00:00', 'admin', 'all', NULL)," +
                 "('admin', 'Phân công coi thi', 'Danh sách phân công coi thi đã được gửi.', '2025-10-01 14:30:00', 'admin', 'giaovien', NULL)," +
@@ -1436,4 +1436,3 @@ public class DBHelper extends SQLiteOpenHelper {
         return tb;
     }
 }
-
