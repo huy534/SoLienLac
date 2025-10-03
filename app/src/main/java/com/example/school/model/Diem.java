@@ -33,8 +33,8 @@ public class Diem {
     public String getTenHocSinh() { return tenHocSinh; }
     public void setTenHocSinh(String tenHocSinh) { this.tenHocSinh = tenHocSinh; }
 
-    public String getTenLop() { return tenLop; }         // ✅ getter
-    public void setTenLop(String tenLop) { this.tenLop = tenLop; }  // ✅ setter
+    public String getTenLop() { return tenLop; }
+    public void setTenLop(String tenLop) { this.tenLop = tenLop; }
 
     public String getTenMon() { return tenMon; }
     public void setTenMon(String tenMon) { this.tenMon = tenMon; }

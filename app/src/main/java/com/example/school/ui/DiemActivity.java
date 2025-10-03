@@ -172,7 +172,7 @@ public class DiemActivity extends AppCompatActivity {
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(editable ? (diem == null ? "Thêm điểm" : "Chi tiết điểm") : "Chi tiết điểm")
+                .setTitle(editable ? (diem == null ? "Thêm điểm" : "Chi tiết điểm/Sửa điểm") : "Chi tiết điểm")
                 .setView(v)
                 .setNegativeButton("Đóng", null);
 
