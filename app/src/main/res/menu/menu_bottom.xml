@@ -1,9 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Admin -->
-    <item android:id="@+id/menu_users" android:title="Người dùng" android:icon="@android:drawable/ic_menu_manage"/>
-    <item android:id="@+id/menu_students" android:title="Học sinh" android:icon="@android:drawable/ic_menu_agenda"/>
-    <item android:id="@+id/menu_classes" android:title="Lớp học" android:icon="@android:drawable/ic_menu_sort_by_size"/>
-    <item android:id="@+id/menu_subjects" android:title="Môn học" android:icon="@android:drawable/ic_menu_info_details"/>
-    <item android:id="@+id/menu_scores" android:title="Điểm" android:icon="@android:drawable/ic_menu_edit"/>
-    <item android:id="@+id/menu_fees" android:title="Học phí" android:icon="@android:drawable/ic_menu_view"/>
-</menu>
