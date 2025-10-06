@@ -19,7 +19,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 47; // tăng khi thay đổi cấu trúc
+    private static final int DB_VERSION = 48; // tăng khi thay đổi cấu trúc
     private Diem buildDiemFromCursor(Cursor c) {
         Diem d = new Diem(
                 c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
@@ -316,7 +316,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         db.execSQL("INSERT INTO ThongBao(guiTu, tieuDe, noiDung, thoiGian, senderRole, targetRole, targetUserId) VALUES " +
                 "('admin', 'Lịch họp', 'Tất cả giáo viên họp chiều thứ 2.', '2025-10-02 09:00:00', 'admin', 'giaovien', NULL)," +
-                "('admin', 'Thông báo nghỉ học', 'Toàn trường nghỉ học ngày 3/10.', '2025-10-02 10:00:00', 'admin', 'all', NULL)," +
+                "('admin', 'Thông báo nghỉ học', 'Toàn trường nghỉ học ngày 7/10.', '2025-10-06 10:00:00', 'admin', 'all', NULL)," +
                 "('admin', 'Phân công coi thi', 'Danh sách phân công coi thi đã được gửi.', '2025-10-01 14:30:00', 'admin', 'giaovien', NULL)," +
                 "('admin', 'Hoạt động', 'Các học sinh sẽ tham gia hoạt động ngoại khóa vào ngày 10/10.', '2025-10-01 08:45:00', 'admin', 'phuhuynh', NULL);");
 
