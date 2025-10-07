@@ -588,7 +588,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if (c != null && c.moveToFirst()) {
             name = c.getString(0);
             c.close();
-        } else if (c != null) c.close();
+        } else c.close();
         db.close();
         return name;
     }
