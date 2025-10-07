@@ -52,7 +52,6 @@ public class HocSinhActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
         toolbar.setTitle("Danh sách học sinh");
         if ("PhuHuynh".equalsIgnoreCase(role)) {
-            // parent: can only view their children
             fabAdd.setVisibility(View.GONE);
             list = db.getStudentsByParent(userId);
             adapter = new HocSinhAdapter(list, null);
