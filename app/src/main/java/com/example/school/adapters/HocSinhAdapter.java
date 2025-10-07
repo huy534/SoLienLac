@@ -13,16 +13,28 @@ import com.example.school.model.HocSinh;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class HocSinhAdapter extends RecyclerView.Adapter<HocSinhAdapter.VH> {
-    private List<HocSinh> list;        // danh sách hiển thị
-    private List<HocSinh> original;    // danh sách gốc để lọc
+    private List<HocSinh> items;        // danh sách hiển thị (có lọc)
+    private final List<HocSinh> originals;    // danh sách gốc để lọc
+
     private OnItemClickListener<HocSinh> clickListener;
     private OnItemLongClickListener<HocSinh> longClickListener;
 
-    public HocSinhAdapter(List<HocSinh> list, Object o) {
-        this.list = new ArrayList<>(list);
-        this.original = new ArrayList<>(list);
+    // Interfaces để Activity set listener
+    public interface OnItemClickListener<T> {
+        void onItemClick(T item);
+    }
+    public interface OnItemLongClickListener<T> {
+        void onItemLongClick(T item);
+    }
+
+    // Constructor: nhận list và optional longClick listener
+    public HocSinhAdapter(List<HocSinh> list, OnItemLongClickListener<HocSinh> longClickListener) {
+        this.items = list == null ? new ArrayList<>() : new ArrayList<>(list);
+        this.originals = new ArrayList<>(this.items);
+        this.longClickListener = longClickListener;
     }
 
     public void setOnItemClickListener(OnItemClickListener<HocSinh> l) {
@@ -43,12 +55,12 @@ public class HocSinhAdapter extends RecyclerView.Adapter<HocSinhAdapter.VH> {
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
-        HocSinh hs = list.get(position);
+        HocSinh hs = items.get(position);
         holder.tvMaHS.setText("Mã HS: " + hs.getId());
-        holder.tvTenHS.setText("Tên: " + hs.getHoTen());
-        holder.tvNgaySinh.setText("Ngày sinh: " + hs.getNgaySinh());
-        holder.tvGioiTinh.setText("Giới tính: " + hs.getGioiTinh());
-        holder.tvQueQuan.setText("Quê quán: " + hs.getQueQuan());
+        holder.tvTenHS.setText("Tên: " + (hs.getHoTen() == null ? "" : hs.getHoTen()));
+        holder.tvNgaySinh.setText("Ngày sinh: " + (hs.getNgaySinh() == null ? "" : hs.getNgaySinh()));
+        holder.tvGioiTinh.setText("Giới tính: " + (hs.getGioiTinh() == null ? "" : hs.getGioiTinh()));
+        holder.tvQueQuan.setText("Quê quán: " + (hs.getQueQuan() == null ? "" : hs.getQueQuan()));
         holder.tvMaLop.setText("Mã lớp: " + hs.getMaLop());
 
         holder.itemView.setOnClickListener(v -> {
@@ -62,20 +74,22 @@ public class HocSinhAdapter extends RecyclerView.Adapter<HocSinhAdapter.VH> {
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return items == null ? 0 : items.size();
     }
 
-    // 🔎 Hàm lọc tìm kiếm
+    // 🔎 Hàm lọc tìm kiếm (theo tên hoặc id)
     public void filter(String text) {
-        list.clear();
-        if (text.isEmpty()) {
-            list.addAll(original);
+        if (text == null) text = "";
+        String q = text.trim().toLowerCase(Locale.getDefault());
+        items = new ArrayList<>();
+        if (q.isEmpty()) {
+            items.addAll(originals);
         } else {
-            text = text.toLowerCase();
-            for (HocSinh hs : original) {
-                if (hs.getHoTen().toLowerCase().contains(text)
-                        || String.valueOf(hs.getId()).contains(text)) {
-                    list.add(hs);
+            for (HocSinh hs : originals) {
+                String name = hs.getHoTen() == null ? "" : hs.getHoTen().toLowerCase(Locale.getDefault());
+                String idStr = String.valueOf(hs.getId());
+                if (name.contains(q) || idStr.contains(q)) {
+                    items.add(hs);
                 }
             }
         }
@@ -84,10 +98,9 @@ public class HocSinhAdapter extends RecyclerView.Adapter<HocSinhAdapter.VH> {
 
     // Cập nhật lại dữ liệu khi refresh
     public void updateData(List<HocSinh> newList) {
-        this.original.clear();
-        this.original.addAll(newList);
-        this.list.clear();
-        this.list.addAll(newList);
+        this.originals.clear();
+        if (newList != null) this.originals.addAll(newList);
+        this.items = new ArrayList<>(this.originals);
         notifyDataSetChanged();
     }
 

@@ -19,7 +19,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 48;
+    private static final int DB_VERSION = 48; // tăng khi thay đổi cấu trúc
     private Diem buildDiemFromCursor(Cursor c) {
         Diem d = new Diem(
                 c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
@@ -36,7 +36,8 @@ public class DBHelper extends SQLiteOpenHelper {
         if (hasColumn(c, "tenLop")) d.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
         return d;
     }
-    // helper an toàn để tránh exception nếu cột không tồn tại
+
+    // helper an toàn để tránh exception nếu cột không t��n tại
     private boolean hasColumn(Cursor cursor, String columnName) {
         try {
             return cursor.getColumnIndex(columnName) != -1;
@@ -1388,4 +1389,120 @@ public class DBHelper extends SQLiteOpenHelper {
         rdb.close();
         return tb;
     }
+    // Thêm học sinh + phụ huynh trong 1 transaction
+    public boolean insertHocSinhWithParent(HocSinh hs, NguoiDung ph) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.beginTransaction();
+
+            ContentValues cvHs = new ContentValues();
+            cvHs.put("hoTen", hs.getHoTen());
+            cvHs.put("ngaySinh", hs.getNgaySinh());
+            cvHs.put("gioiTinh", hs.getGioiTinh());
+            cvHs.put("queQuan", hs.getQueQuan());
+            cvHs.put("maLop", hs.getMaLop());
+            long hsId = db.insert("HocSinh", null, cvHs);
+            if (hsId == -1) throw new RuntimeException("Insert HocSinh failed");
+
+            ContentValues cvPh = new ContentValues();
+            cvPh.put("tenDangNhap", ph.getTenDangNhap());
+            cvPh.put("matKhau", HashUtils.sha256(ph.getMatKhau()));
+            cvPh.put("vaiTro", "phuhuynh");
+            cvPh.put("email", ph.getEmail());
+            cvPh.put("sdt", ph.getSdt());
+            long phId = db.insert("NguoiDung", null, cvPh);
+            if (phId == -1) throw new RuntimeException("Insert NguoiDung (parent) failed");
+
+            ContentValues map = new ContentValues();
+            map.put("userId", phId);
+            map.put("studentId", hsId);
+            db.insert("ParentStudent", null, map);
+
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    // Cập nhật học sinh và (nếu cung cấp) cập nhật phụ huynh liên kết (nếu parentId tồn tại)
+    public boolean updateHocSinhAndParent(HocSinh hs, NguoiDung ph) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.beginTransaction();
+
+            ContentValues cvHs = new ContentValues();
+            cvHs.put("hoTen", hs.getHoTen());
+            cvHs.put("ngaySinh", hs.getNgaySinh());
+            cvHs.put("gioiTinh", hs.getGioiTinh());
+            cvHs.put("queQuan", hs.getQueQuan());
+            cvHs.put("maLop", hs.getMaLop());
+            db.update("HocSinh", cvHs, "id=?", new String[]{String.valueOf(hs.getId())});
+
+            // cập nhật thông tin phụ huynh nếu ph != null và mapping tồn tại
+            if (ph != null) {
+                Cursor c = db.rawQuery("SELECT userId FROM ParentStudent WHERE studentId=?", new String[]{String.valueOf(hs.getId())});
+                if (c != null && c.moveToFirst()) {
+                    int parentId = c.getInt(0);
+                    ContentValues cvPh = new ContentValues();
+                    if (ph.getHoTen() != null) cvPh.put("hoTen", ph.getHoTen());
+                    if (ph.getEmail() != null) cvPh.put("email", ph.getEmail());
+                    if (ph.getSdt() != null) cvPh.put("sdt", ph.getSdt());
+                    if (ph.getMatKhau() != null && !ph.getMatKhau().isEmpty()) cvPh.put("matKhau", HashUtils.sha256(ph.getMatKhau()));
+                    db.update("NguoiDung", cvPh, "id=?", new String[]{String.valueOf(parentId)});
+                }
+                c.close();
+            }
+
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    // Xóa học sinh, xóa mapping ParentStudent, nếu phụ huynh không còn mapping nào => xóa phụ huynh luôn
+    public boolean deleteHocSinhCascade(int hsId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.beginTransaction();
+
+            // tìm parent nếu có (lấy 1 parent đầu tiên nếu nhiều)
+            Integer parentId = null;
+            Cursor c = db.rawQuery("SELECT userId FROM ParentStudent WHERE studentId=?", new String[]{String.valueOf(hsId)});
+            if (c.moveToFirst()) parentId = c.getInt(0);
+            c.close();
+
+            // xóa mapping và học sinh
+            db.delete("ParentStudent", "studentId=?", new String[]{String.valueOf(hsId)});
+            db.delete("HocSinh", "id=?", new String[]{String.valueOf(hsId)});
+
+            // xóa Diem liên quan
+            db.delete("Diem", "hocSinhId=?", new String[]{String.valueOf(hsId)});
+
+            // nếu parent không còn học sinh nào -> xóa parent
+            if (parentId != null) {
+                Cursor c2 = db.rawQuery("SELECT COUNT(*) FROM ParentStudent WHERE userId=?", new String[]{String.valueOf(parentId)});
+                if (c2.moveToFirst() && c2.getInt(0) == 0) {
+                    db.delete("NguoiDung", "id=?", new String[]{String.valueOf(parentId)});
+                }
+                c2.close();
+            }
+
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
 }
