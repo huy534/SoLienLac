@@ -90,7 +90,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "khoi TEXT," +
                 "namHoc TEXT," +
                 "siSo INTEGER," +
-                "gvcn INTEGER)"); // gvcn stores user id of teacher
+                "gvcn INTEGER)");
 
         // HocSinh
         db.execSQL("CREATE TABLE IF NOT EXISTS HocSinh (" +
@@ -106,7 +106,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "tenMon TEXT," +
                 "soTiet INTEGER," +
-                "teacherId INTEGER)"); // teacherId -> user id of teacher
+                "teacherId INTEGER)"); 
 
         // Diem (expanded)
         db.execSQL("CREATE TABLE IF NOT EXISTS Diem (" +
@@ -147,14 +147,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 "tieuDe TEXT," +
                 "noiDung TEXT," +
                 "thoiGian TEXT," +
-                "targetRole TEXT," +   // <== thêm dòng này
-                "senderRole TEXT," +   // <== và dòng này
-                "targetUserId INTEGER" // nếu cần thông báo cá nhân
+                "targetRole TEXT," +
+                "senderRole TEXT," +
+                "targetUserId INTEGER"
                 + ")");
-
-
-
-        // Seed dữ liệu mẫu an toàn
         seedData(db);
     }
 
