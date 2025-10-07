@@ -187,7 +187,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 new Object[]{username, hashed, role, email, sdt});
         Cursor c = db.rawQuery("SELECT id FROM NguoiDung WHERE tenDangNhap=?", new String[]{username});
         long id = -1;
-        if (c != null && c.moveToFirst()) {
+        if (c.moveToFirst()) {
             id = c.getLong(0);
             c.close();
         }
@@ -197,7 +197,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private int getUserIdByUsername(SQLiteDatabase db, String username) {
         Cursor c = db.rawQuery("SELECT id FROM NguoiDung WHERE tenDangNhap=?", new String[]{username});
         int id = -1;
-        if (c != null && c.moveToFirst()) {
+        if (c.moveToFirst()) {
             id = c.getInt(0);
             c.close();
         }
@@ -425,7 +425,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String hashed = HashUtils.sha256(password);
         Cursor c = db.rawQuery("SELECT * FROM NguoiDung WHERE tenDangNhap=? AND matKhau=?", new String[]{username, hashed});
         NguoiDung u = null;
-        if (c != null && c.moveToFirst()) {
+        if (c.moveToFirst()) {
             u = new NguoiDung(
                     c.getInt(c.getColumnIndexOrThrow("id")),
                     c.getString(c.getColumnIndexOrThrow("hoTen")),
@@ -436,7 +436,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     c.getString(c.getColumnIndexOrThrow("sdt"))
             );
             c.close();
-        } else if (c != null) c.close();
+        } else c.close();
         db.close();
         return u;
     }
@@ -457,44 +457,39 @@ public class DBHelper extends SQLiteOpenHelper {
         List<NguoiDung> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM NguoiDung", null);
-        if (c != null) {
-            while (c.moveToNext()) {
-                NguoiDung u = new NguoiDung(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("hoTen")),
-                        c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
-                        c.getString(c.getColumnIndexOrThrow("matKhau")),
-                        c.getString(c.getColumnIndexOrThrow("vaiTro")),
-                        c.getString(c.getColumnIndexOrThrow("email")),
-                        c.getString(c.getColumnIndexOrThrow("sdt"))
-                );
-                list.add(u);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            NguoiDung u = new NguoiDung(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("hoTen")),
+                    c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
+                    c.getString(c.getColumnIndexOrThrow("matKhau")),
+                    c.getString(c.getColumnIndexOrThrow("vaiTro")),
+                    c.getString(c.getColumnIndexOrThrow("email")),
+                    c.getString(c.getColumnIndexOrThrow("sdt"))
+            );
+            list.add(u);
         }
+        c.close();
         db.close();
         return list;
     }
-
     // Lấy người dùng theo vai trò
     public List<NguoiDung> getUsersByRole(String role) {
         List<NguoiDung> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM NguoiDung WHERE vaiTro=?", new String[]{role});
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(new NguoiDung(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("hoTen")),
-                        c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
-                        c.getString(c.getColumnIndexOrThrow("matKhau")),
-                        c.getString(c.getColumnIndexOrThrow("vaiTro")),
-                        c.getString(c.getColumnIndexOrThrow("email")),
-                        c.getString(c.getColumnIndexOrThrow("sdt"))
-                ));
-            }
-            c.close();
+        while (c.moveToNext()) {
+            list.add(new NguoiDung(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("hoTen")),
+                    c.getString(c.getColumnIndexOrThrow("tenDangNhap")),
+                    c.getString(c.getColumnIndexOrThrow("matKhau")),
+                    c.getString(c.getColumnIndexOrThrow("vaiTro")),
+                    c.getString(c.getColumnIndexOrThrow("email")),
+                    c.getString(c.getColumnIndexOrThrow("sdt"))
+            ));
         }
+        c.close();
         db.close();
         return list;
     }
@@ -546,17 +541,15 @@ public class DBHelper extends SQLiteOpenHelper {
         List<MonHoc> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM MonHoc", null);
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(new MonHoc(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("tenMon")),
-                        c.getInt(c.getColumnIndexOrThrow("soTiet")),
-                        c.getInt(c.getColumnIndexOrThrow("teacherId"))
-                ));
-            }
-            c.close();
+        while (c.moveToNext()) {
+            list.add(new MonHoc(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("tenMon")),
+                    c.getInt(c.getColumnIndexOrThrow("soTiet")),
+                    c.getInt(c.getColumnIndexOrThrow("teacherId"))
+            ));
         }
+        c.close();
         db.close();
         return list;
     }
@@ -565,17 +558,15 @@ public class DBHelper extends SQLiteOpenHelper {
         List<MonHoc> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM MonHoc WHERE teacherId=?", new String[]{String.valueOf(teacherUserId)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(new MonHoc(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("tenMon")),
-                        c.getInt(c.getColumnIndexOrThrow("soTiet")),
-                        c.getInt(c.getColumnIndexOrThrow("teacherId"))
-                ));
-            }
-            c.close();
+        while (c.moveToNext()) {
+            list.add(new MonHoc(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("tenMon")),
+                    c.getInt(c.getColumnIndexOrThrow("soTiet")),
+                    c.getInt(c.getColumnIndexOrThrow("teacherId"))
+            ));
         }
+        c.close();
         db.close();
         return list;
     }
@@ -585,7 +576,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT tenDangNhap FROM NguoiDung WHERE id=?", new String[]{String.valueOf(userId)});
         String name = "";
-        if (c != null && c.moveToFirst()) {
+        if (c.moveToFirst()) {
             name = c.getString(0);
             c.close();
         } else c.close();
@@ -597,7 +588,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM MonHoc WHERE id=?", new String[]{String.valueOf(id)});
         MonHoc m = null;
-        if (c != null && c.moveToFirst()) {
+        if (c.moveToFirst()) {
             m = new MonHoc(
                     c.getInt(c.getColumnIndexOrThrow("id")),
                     c.getString(c.getColumnIndexOrThrow("tenMon")),
@@ -605,7 +596,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     c.getInt(c.getColumnIndexOrThrow("teacherId"))
             );
             c.close();
-        } else if (c != null) c.close();
+        } else c.close();
         db.close();
         return m;
     }
@@ -709,13 +700,11 @@ public class DBHelper extends SQLiteOpenHelper {
                         "WHERE ps.userId = ?",
                 new String[]{String.valueOf(parentUserId)}
         );
-        if (c != null) {
-            while (c.moveToNext()) {
-                Diem d = buildDiemFromCursor(c);
-                list.add(d);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            Diem d = buildDiemFromCursor(c);
+            list.add(d);
         }
+        c.close();
         return list;
     }
     // Diem by teacher
@@ -730,13 +719,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 "WHERE m.teacherId = ? " +
                 "ORDER BY hs.hoTen";
         Cursor c = db.rawQuery(sql, new String[]{String.valueOf(gvId)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                Diem d = buildDiemFromCursor(c); // dùng helper
-                list.add(d);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            Diem d = buildDiemFromCursor(c); // dùng helper
+            list.add(d);
         }
+        c.close();
         return list;
     }
 
@@ -834,31 +821,29 @@ public class DBHelper extends SQLiteOpenHelper {
                 "LEFT JOIN NguoiDung n ON m.teacherId = n.id " +
                 "ORDER BY t.maLop, t.thu, t.tiet";
         Cursor c = rdb.rawQuery(sql, null);
-        if (c != null) {
-            while (c.moveToNext()) {
-                TKB t = new TKB();
-                t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
-                t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
-                t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
-                t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
-                t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
-                // optional display fields
-                try {
-                    t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
-                } catch (Exception ignored) {
-                }
-                try {
-                    t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
-                } catch (Exception ignored) {
-                }
-                try {
-                    t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv")));
-                } catch (Exception ignored) {
-                }
-                list.add(t);
+        while (c.moveToNext()) {
+            TKB t = new TKB();
+            t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
+            t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
+            t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
+            t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
+            t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
+            // optional display fields
+            try {
+                t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
+            } catch (Exception ignored) {
             }
-            c.close();
+            try {
+                t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
+            } catch (Exception ignored) {
+            }
+            try {
+                t.setTenGv(c.getString(c.getColumnIndexOrThrow("tenGv")));
+            } catch (Exception ignored) {
+            }
+            list.add(t);
         }
+        c.close();
         rdb.close();
         return list;
     }
@@ -910,10 +895,8 @@ public class DBHelper extends SQLiteOpenHelper {
         // get class
         int maLop = -1;
         Cursor c1 = rdb.rawQuery("SELECT maLop FROM HocSinh WHERE id=?", new String[]{String.valueOf(studentId)});
-        if (c1 != null) {
-            if (c1.moveToFirst()) maLop = c1.getInt(0);
-            c1.close();
-        }
+        if (c1.moveToFirst()) maLop = c1.getInt(0);
+        c1.close();
         if (maLop <= 0) {
             rdb.close();
             return list;
@@ -926,26 +909,24 @@ public class DBHelper extends SQLiteOpenHelper {
                 "WHERE t.maLop = ? " +
                 "ORDER BY t.thu, t.tiet";
         Cursor c = rdb.rawQuery(sql, new String[]{String.valueOf(maLop)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                TKB t = new TKB();
-                t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
-                t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
-                t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
-                t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
-                t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
-                try {
-                    t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
-                } catch (Exception ignored) {
-                }
-                try {
-                    t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
-                } catch (Exception ignored) {
-                }
-                list.add(t);
+        while (c.moveToNext()) {
+            TKB t = new TKB();
+            t.setId(c.getInt(c.getColumnIndexOrThrow("id")));
+            t.setMaLop(c.getInt(c.getColumnIndexOrThrow("maLop")));
+            t.setMaMon(c.getInt(c.getColumnIndexOrThrow("maMon")));
+            t.setThu(c.getInt(c.getColumnIndexOrThrow("thu")));
+            t.setTiet(c.getInt(c.getColumnIndexOrThrow("tiet")));
+            try {
+                t.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
+            } catch (Exception ignored) {
             }
-            c.close();
+            try {
+                t.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
+            } catch (Exception ignored) {
+            }
+            list.add(t);
         }
+        c.close();
         rdb.close();
         return list;
     }
@@ -959,20 +940,18 @@ public class DBHelper extends SQLiteOpenHelper {
         List<LopHoc> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT l.*, n.tenDangNhap as gvName FROM LopHoc l LEFT JOIN NguoiDung n ON l.gvcn = n.id", null);
-        if (c != null) {
-            while (c.moveToNext()) {
-                LopHoc l = new LopHoc(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("tenLop")),
-                        c.getString(c.getColumnIndexOrThrow("khoi")),
-                        c.getString(c.getColumnIndexOrThrow("namHoc")),
-                        c.getInt(c.getColumnIndexOrThrow("siSo")),
-                        c.getInt(c.getColumnIndexOrThrow("gvcn"))
-                );
-                list.add(l);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            LopHoc l = new LopHoc(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("tenLop")),
+                    c.getString(c.getColumnIndexOrThrow("khoi")),
+                    c.getString(c.getColumnIndexOrThrow("namHoc")),
+                    c.getInt(c.getColumnIndexOrThrow("siSo")),
+                    c.getInt(c.getColumnIndexOrThrow("gvcn"))
+            );
+            list.add(l);
         }
+        c.close();
         db.close();
         return list;
     }
@@ -980,10 +959,10 @@ public class DBHelper extends SQLiteOpenHelper {
         String s = "";
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT tenLop FROM LopHoc WHERE id=?", new String[]{String.valueOf(id)});
-        if (c != null && c.moveToFirst()) {
+        if (c.moveToFirst()) {
             s = c.getString(0);
             c.close();
-        } else if (c != null) {
+        } else {
             c.close();
         }
         db.close();
@@ -1092,19 +1071,17 @@ public class DBHelper extends SQLiteOpenHelper {
                 "SELECT * FROM LopHoc WHERE gvcn = ?",
                 new String[]{String.valueOf(teacherUserId)}
         );
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(new LopHoc(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("tenLop")),
-                        c.getString(c.getColumnIndexOrThrow("khoi")),
-                        c.getString(c.getColumnIndexOrThrow("namHoc")),
-                        c.getInt(c.getColumnIndexOrThrow("siSo")),
-                        c.getInt(c.getColumnIndexOrThrow("gvcn"))
-                ));
-            }
-            c.close();
+        while (c.moveToNext()) {
+            list.add(new LopHoc(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("tenLop")),
+                    c.getString(c.getColumnIndexOrThrow("khoi")),
+                    c.getString(c.getColumnIndexOrThrow("namHoc")),
+                    c.getInt(c.getColumnIndexOrThrow("siSo")),
+                    c.getInt(c.getColumnIndexOrThrow("gvcn"))
+            ));
         }
+        c.close();
         db.close();
         return list;
     }
@@ -1120,13 +1097,11 @@ public class DBHelper extends SQLiteOpenHelper {
                         "JOIN MonHoc m ON d.monId = m.id",
                 null
         );
-        if (c != null) {
-            while (c.moveToNext()) {
-                Diem d = buildDiemFromCursor(c);
-                list.add(d);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            Diem d = buildDiemFromCursor(c);
+            list.add(d);
         }
+        c.close();
         return list;
     }
 
@@ -1172,19 +1147,17 @@ public class DBHelper extends SQLiteOpenHelper {
         NguoiDung user = null;
         Cursor c = db.rawQuery("SELECT id, hoTen, tenDangNhap, matKhau, vaiTro, email, sdt FROM NguoiDung WHERE id=?",
                 new String[]{String.valueOf(id)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                user = new NguoiDung();
-                user.setId(c.getInt(0));
-                user.setHoTen(c.getString(1));
-                user.setTenDangNhap(c.getString(2));
-                user.setMatKhau(c.getString(3));
-                user.setVaiTro(c.getString(4));
-                user.setEmail(c.getString(5));
-                user.setSdt(c.getString(6));
-            }
-            c.close();
+        if (c.moveToFirst()) {
+            user = new NguoiDung();
+            user.setId(c.getInt(0));
+            user.setHoTen(c.getString(1));
+            user.setTenDangNhap(c.getString(2));
+            user.setMatKhau(c.getString(3));
+            user.setVaiTro(c.getString(4));
+            user.setEmail(c.getString(5));
+            user.setSdt(c.getString(6));
         }
+        c.close();
         return user;
     }
 
@@ -1202,12 +1175,10 @@ public class DBHelper extends SQLiteOpenHelper {
 // DBHelper.java
     public boolean changePassword(int userId, String oldPassword, String newPassword) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = null;
-        try {
+        try (Cursor cursor = db.rawQuery("SELECT matKhau FROM NguoiDung WHERE id = ?",
+                new String[]{String.valueOf(userId)})) {
             // Lấy mật khẩu hiện tại
-            cursor = db.rawQuery("SELECT matKhau FROM NguoiDung WHERE id = ?",
-                    new String[]{String.valueOf(userId)});
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor.moveToFirst()) {
                 String storedHash = cursor.getString(0);
                 String oldHash = HashUtils.sha256(oldPassword);
 
@@ -1227,8 +1198,6 @@ public class DBHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        } finally {
-            if (cursor != null) cursor.close();
         }
     }
     // Thống kê chuyên cần theo môn
@@ -1236,10 +1205,8 @@ public class DBHelper extends SQLiteOpenHelper {
         int id = -1;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT studentId FROM ParentStudent WHERE userId=? LIMIT 1", new String[]{String.valueOf(parentId)});
-        if (c != null) {
-            if (c.moveToFirst()) id = c.getInt(0);
-            c.close();
-        }
+        if (c.moveToFirst()) id = c.getInt(0);
+        c.close();
         return id;
     }
     // Trả về danh sách AttendanceReportItem cho 1 học sinh
@@ -1256,34 +1223,34 @@ public class DBHelper extends SQLiteOpenHelper {
 
         Cursor c = rdb.rawQuery(sql, new String[]{ String.valueOf(studentId) });
         Map<Integer, SubjectAttendance> map = new LinkedHashMap<>();
-        if (c != null) {
-            while (c.moveToNext()) {
-                int monId = c.getInt(c.getColumnIndexOrThrow("monId"));
-                String tenMon = c.getString(c.getColumnIndexOrThrow("tenMon"));
-                int status = c.getInt(c.getColumnIndexOrThrow("status"));
-                int cnt = c.getInt(c.getColumnIndexOrThrow("cnt"));
+        while (c.moveToNext()) {
+            int monId = c.getInt(c.getColumnIndexOrThrow("monId"));
+            String tenMon = c.getString(c.getColumnIndexOrThrow("tenMon"));
+            int status = c.getInt(c.getColumnIndexOrThrow("status"));
+            int cnt = c.getInt(c.getColumnIndexOrThrow("cnt"));
 
-                SubjectAttendance sa = map.get(monId);
-                if (sa == null) {
-                    sa = new SubjectAttendance(monId, tenMon);
-                    map.put(monId, sa);
-                }
+            SubjectAttendance sa = map.computeIfAbsent(monId, i -> new SubjectAttendance(i, tenMon));
 
-                switch (status) {
-                    case 0: sa.addPresent(cnt); break;
-                    case 1: sa.addPermitLeave(cnt); break;
-                    case 2: sa.addAbsent(cnt); break;
-                    case 3: sa.addLate(cnt); break;
-                }
+            switch (status) {
+                case 0:
+                    sa.addPresent(cnt);
+                    break;
+                case 1:
+                    sa.addPermitLeave(cnt);
+                    break;
+                case 2:
+                    sa.addAbsent(cnt);
+                    break;
+                case 3:
+                    sa.addLate(cnt);
+                    break;
             }
-            c.close();
         }
+        c.close();
         rdb.close();
         list.addAll(map.values());
         return list;
     }
-
-
     // Trả về điểm TB theo môn cho 1 HS => List<Pair<tenMon, diemTB>>
     public List<TwoColumn> getAverageScoresByStudent(int studentId) {
         List<TwoColumn> list = new ArrayList<>();
@@ -1294,16 +1261,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 "WHERE d.hocSinhId = ? " +
                 "GROUP BY m.id, m.tenMon";
         Cursor c = db.rawQuery(sql, new String[]{String.valueOf(studentId)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                TwoColumn t = new TwoColumn();
-                t.setId(c.getInt(c.getColumnIndexOrThrow("monId")));
-                t.setLabel(c.getString(c.getColumnIndexOrThrow("tenMon")));
-                t.setValue((float) c.getDouble(c.getColumnIndexOrThrow("avgTB")));
-                list.add(t);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            TwoColumn t = new TwoColumn();
+            t.setId(c.getInt(c.getColumnIndexOrThrow("monId")));
+            t.setLabel(c.getString(c.getColumnIndexOrThrow("tenMon")));
+            t.setValue((float) c.getDouble(c.getColumnIndexOrThrow("avgTB")));
+            list.add(t);
         }
+        c.close();
         db.close();
         return list;
     }
@@ -1333,44 +1298,39 @@ public class DBHelper extends SQLiteOpenHelper {
         List<ThongBao> list = new ArrayList<>();
         SQLiteDatabase rdb = getReadableDatabase();
         Cursor c = rdb.rawQuery("SELECT * FROM ThongBao ORDER BY thoiGian DESC", null);
-        if (c != null) {
-            while (c.moveToNext()) {
-                ThongBao tb = new ThongBao(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("guiTu")),
-                        c.getString(c.getColumnIndexOrThrow("tieuDe")),
-                        c.getString(c.getColumnIndexOrThrow("noiDung")),
-                        c.getString(c.getColumnIndexOrThrow("thoiGian")),
-                        c.getString(c.getColumnIndexOrThrow("targetRole")),
-                        c.getString(c.getColumnIndexOrThrow("senderRole"))
-                );
-                list.add(tb);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            ThongBao tb = new ThongBao(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("guiTu")),
+                    c.getString(c.getColumnIndexOrThrow("tieuDe")),
+                    c.getString(c.getColumnIndexOrThrow("noiDung")),
+                    c.getString(c.getColumnIndexOrThrow("thoiGian")),
+                    c.getString(c.getColumnIndexOrThrow("targetRole")),
+                    c.getString(c.getColumnIndexOrThrow("senderRole"))
+            );
+            list.add(tb);
         }
+        c.close();
         rdb.close();
         return list;
     }
-
     public List<ThongBao> getThongBaoByTarget(String targetRole) {
         List<ThongBao> list = new ArrayList<>();
         SQLiteDatabase rdb = getReadableDatabase();
         Cursor c = rdb.rawQuery("SELECT * FROM ThongBao WHERE targetRole=? OR targetRole='all' ORDER BY thoiGian DESC", new String[]{targetRole});
-        if (c != null) {
-            while (c.moveToNext()) {
-                ThongBao tb = new ThongBao(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("guiTu")),
-                        c.getString(c.getColumnIndexOrThrow("tieuDe")),
-                        c.getString(c.getColumnIndexOrThrow("noiDung")),
-                        c.getString(c.getColumnIndexOrThrow("thoiGian")),
-                        c.getString(c.getColumnIndexOrThrow("targetRole")),
-                        c.getString(c.getColumnIndexOrThrow("senderRole"))
-                );
-                list.add(tb);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            ThongBao tb = new ThongBao(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("guiTu")),
+                    c.getString(c.getColumnIndexOrThrow("tieuDe")),
+                    c.getString(c.getColumnIndexOrThrow("noiDung")),
+                    c.getString(c.getColumnIndexOrThrow("thoiGian")),
+                    c.getString(c.getColumnIndexOrThrow("targetRole")),
+                    c.getString(c.getColumnIndexOrThrow("senderRole"))
+            );
+            list.add(tb);
         }
+        c.close();
         rdb.close();
         return list;
     }
@@ -1387,7 +1347,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String role = "";
         SQLiteDatabase rdb = getReadableDatabase();
         Cursor rc = rdb.rawQuery("SELECT vaiTro FROM NguoiDung WHERE id=?", new String[]{String.valueOf(userId)});
-        if (rc != null && rc.moveToFirst()) {
+        if (rc.moveToFirst()) {
             role = rc.getString(0);
             rc.close();
         }
@@ -1398,21 +1358,19 @@ public class DBHelper extends SQLiteOpenHelper {
                 "SELECT * FROM ThongBao WHERE targetRole='all' OR targetRole=? OR targetUserId=? ORDER BY thoiGian DESC",
                 new String[]{role, String.valueOf(userId)}
         );
-        if (c != null) {
-            while (c.moveToNext()) {
-                ThongBao tb = new ThongBao(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("guiTu")),
-                        c.getString(c.getColumnIndexOrThrow("tieuDe")),
-                        c.getString(c.getColumnIndexOrThrow("noiDung")),
-                        c.getString(c.getColumnIndexOrThrow("thoiGian")),
-                        c.getString(c.getColumnIndexOrThrow("targetRole")),
-                        c.getString(c.getColumnIndexOrThrow("senderRole"))
-                );
-                list.add(tb);
-            }
-            c.close();
+        while (c.moveToNext()) {
+            ThongBao tb = new ThongBao(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("guiTu")),
+                    c.getString(c.getColumnIndexOrThrow("tieuDe")),
+                    c.getString(c.getColumnIndexOrThrow("noiDung")),
+                    c.getString(c.getColumnIndexOrThrow("thoiGian")),
+                    c.getString(c.getColumnIndexOrThrow("targetRole")),
+                    c.getString(c.getColumnIndexOrThrow("senderRole"))
+            );
+            list.add(tb);
         }
+        c.close();
         rdb.close();
         return list;
     }
@@ -1420,7 +1378,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase rdb = getReadableDatabase();
         Cursor c = rdb.rawQuery("SELECT id, guiTu, targetRole, tieuDe, noiDung, thoiGian FROM ThongBao WHERE id=?", new String[]{String.valueOf(id)});
         ThongBao tb = null;
-        if (c != null && c.moveToFirst()) {
+        if (c.moveToFirst()) {
             tb = new ThongBao(
                     c.getInt(c.getColumnIndexOrThrow("id")),
                     c.getString(c.getColumnIndexOrThrow("guiTu")),
@@ -1431,7 +1389,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     c.getString(c.getColumnIndexOrThrow("senderRole"))
             );
             c.close();
-        } else if (c != null) c.close();
+        } else c.close();
         rdb.close();
         return tb;
     }
