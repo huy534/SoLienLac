@@ -19,7 +19,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 48; // tăng khi thay đổi cấu trúc
+    private static final int DB_VERSION = 48;
     private Diem buildDiemFromCursor(Cursor c) {
         Diem d = new Diem(
                 c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
@@ -36,7 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if (hasColumn(c, "tenLop")) d.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
         return d;
     }
-    // helper an toàn để tránh exception nếu cột không t��n tại
+    // helper an toàn để tránh exception nếu cột không tồn tại
     private boolean hasColumn(Cursor cursor, String columnName) {
         try {
             return cursor.getColumnIndex(columnName) != -1;
