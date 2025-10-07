@@ -55,10 +55,9 @@ public class HocSinhActivity extends AppCompatActivity {
             // parent: can only view their children
             fabAdd.setVisibility(View.GONE);
             list = db.getStudentsByParent(userId);
-            adapter = new HocSinhAdapter(list, null); // no long-click delete
+            adapter = new HocSinhAdapter(list, null);
             recyclerView.setAdapter(adapter);
         } else if ("GiaoVien".equalsIgnoreCase(role)) {
-            // teacher: view students of classes they are GVCN of; allow add/edit/delete within their classes
             fabAdd.setVisibility(View.VISIBLE);;
 
             fabAdd.setOnClickListener(v -> showAddEditDialog(null, userId));
@@ -66,7 +65,7 @@ public class HocSinhActivity extends AppCompatActivity {
             // Admin / others: full access
             fabAdd.setVisibility(View.VISIBLE);
             list = db.getAllHocSinh();
-            adapter = new HocSinhAdapter(list, null); // no long-click delete
+            adapter = new HocSinhAdapter(list, null);
             recyclerView.setAdapter(adapter);
 
             fabAdd.setOnClickListener(v -> showAddEditDialog(null, -1));
