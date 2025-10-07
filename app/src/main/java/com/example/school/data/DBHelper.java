@@ -36,7 +36,6 @@ public class DBHelper extends SQLiteOpenHelper {
         if (hasColumn(c, "tenLop")) d.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
         return d;
     }
-
     // helper an toàn để tránh exception nếu cột không t��n tại
     private boolean hasColumn(Cursor cursor, String columnName) {
         try {
