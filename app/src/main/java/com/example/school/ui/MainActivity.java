@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.school.R;
 import com.example.school.auth.SessionManager;
@@ -19,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private SessionManager session;
     private DBHelper db;
 
-    private TextView tvWelcome;
+    private Toolbar toolbarMain;
     private Button btnHocSinh, btnLopHoc, btnMonHoc, btnDiem, btnUsers, btnLogout, btnTKB, btnBaoCao, btnThongBao, btnTaiKhoan;
 
     @Override
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         }
-        tvWelcome = findViewById(R.id.tvWelcome);
+        toolbarMain = findViewById(R.id.toolbarMain);
         btnHocSinh = findViewById(R.id.btnHocSinh);
         btnLopHoc = findViewById(R.id.btnLopHoc);
         btnMonHoc = findViewById(R.id.btnMonHoc);
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         btnThongBao = findViewById(R.id.btnThongBao);
         btnTaiKhoan = findViewById(R.id.btnTaiKhoan);
 
+
         int userId = session.getUserId();
         String role = session.getUserRole(); 
         String username = "";
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (username == null || username.isEmpty()) username = "Người dùng " + (userId > 0 ? userId : "");
         String roleDisplay = (role == null || role.isEmpty()) ? "user" : role;
-        tvWelcome.setText("Xin chào " + username);
+        toolbarMain.setTitle("Sổ liên lạc - Xin chào " + username);
         applyRolePermissions(role);
         btnHocSinh.setOnClickListener(v -> startActivity(new Intent(this, HocSinhActivity.class)));
         btnLopHoc.setOnClickListener(v -> startActivity(new Intent(this, LopHocActivity.class)));

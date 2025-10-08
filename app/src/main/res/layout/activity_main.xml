@@ -8,25 +8,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background"/>
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarMain"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#00B4D8"
+        android:textAlignment="center"
         android:title="Sổ liên lạc"
-        android:titleTextColor="@android:color/white"
-        app:layout_scrollFlags="scroll|enterAlways" />
-
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Xin chào"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:padding="12dp"
-        android:layout_marginTop="?attr/actionBarSize" />
+        android:titleTextColor="@color/material_dynamic_neutral95"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:subtitleTextColor="#E7DFDF" />
 
     <LinearLayout
         android:id="@+id/contentMain"
