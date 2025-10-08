@@ -18,7 +18,8 @@
         android:title="Sổ liên lạc"
         android:titleTextColor="@color/material_dynamic_neutral95"
         app:layout_scrollFlags="scroll|enterAlways"
-        app:subtitleTextColor="#E7DFDF" />
+        app:subtitleTextColor="#E7DFDF"
+        app:titleCentered="true"/>
 
     <LinearLayout
         android:id="@+id/contentMain"

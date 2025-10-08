@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
         btnBaoCao = findViewById(R.id.btnBaoCao);
         btnThongBao = findViewById(R.id.btnThongBao);
         btnTaiKhoan = findViewById(R.id.btnTaiKhoan);
-
-
+        toolbarMain.setTitleTextColor(getResources().getColor(R.color.white));
+        toolbarMain.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         int userId = session.getUserId();
         String role = session.getUserRole(); 
         String username = "";
