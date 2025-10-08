@@ -11,8 +11,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/background"/>
 
-      <!-- Standard Toolbar (dùng AppCompat để tránh yêu cầu MaterialComponents nếu chưa cấu hình theme) -->
-    <androidx.appcompat.widget.Toolbar
+       <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarDiem"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
@@ -23,8 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- SearchView -->
-    <androidx.appcompat.widget.SearchView
+     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchDiem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -35,7 +33,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp" />
 
-    <!-- Empty state -->
     <TextView
         android:id="@+id/tvEmptyDiem"
         android:layout_width="wrap_content"
@@ -48,7 +45,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:paddingTop="24dp"/>
 
-    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewDiem"
         android:layout_width="0dp"
@@ -60,7 +56,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- FAB (dùng android:src để tránh lỗi khi app:srcCompat chưa sẵn sàng) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddDiem"
         android:layout_width="wrap_content"

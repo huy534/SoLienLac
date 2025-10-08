@@ -17,10 +17,9 @@
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="match_parent"
-            android:layout_height="286dp"
+            android:layout_height="224dp"
             app:srcCompat="@drawable/app" />
     </RelativeLayout>
-
     <TextView
         android:id="@+id/tvLoginTitle"
         android:layout_width="0dp"
@@ -80,5 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword" />
+
     </com.google.android.material.textfield.TextInputLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,6 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarBaoCao"
@@ -19,8 +23,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:padding="24dp">
-
-        <Button
+         <Button
             android:id="@+id/btnBaoCaoChuyenCan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,4 +39,5 @@
             android:text="Báo cáo học tập" />
 
     </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>
