@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             username = "";
         }
         if (username == null || username.isEmpty()) username = "Người dùng " + (userId > 0 ? userId : "");
-        String roleDisplay = (role == null || role.isEmpty()) ? "user" : role;
+
         toolbarMain.setTitle("Sổ liên lạc - Xin chào " + username);
         applyRolePermissions(role);
         btnHocSinh.setOnClickListener(v -> startActivity(new Intent(this, HocSinhActivity.class)));
