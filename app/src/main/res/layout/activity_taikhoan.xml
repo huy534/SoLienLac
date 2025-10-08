@@ -10,7 +10,7 @@
         android:id="@+id/toolbarTK"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="#00B4D8"
         android:title="Tài khoản"
         android:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_arrow_back" />
@@ -120,23 +120,20 @@
                     android:hint="Số điện thoại"
                     android:inputType="phone"/>
             </LinearLayout>
-
-            <!-- Nút cập nhật -->
             <Button
                 android:id="@+id/btnUpdateInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Cập nhật thông tin"
+                android:backgroundTint="#00B4D8"
                 android:layout_marginTop="16dp"/>
-
-            <!-- Nút đổi mật khẩu -->
             <Button
                 android:id="@+id/btnChangePassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Đổi mật khẩu"
-                android:layout_marginTop="12dp"
-                android:backgroundTint="@android:color/holo_blue_light"/>
+                android:backgroundTint="#00C896"
+                android:layout_marginTop="12dp"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

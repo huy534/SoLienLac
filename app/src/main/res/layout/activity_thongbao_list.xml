@@ -9,7 +9,7 @@
         android:id="@+id/toolbarThongBaoList"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="#00B4D8"
         android:title="Lịch sử thông báo"
         android:titleTextColor="@android:color/white"/>
 

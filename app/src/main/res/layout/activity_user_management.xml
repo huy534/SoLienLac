@@ -11,7 +11,7 @@
         android:id="@+id/toolbarUsers"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="#00B4D8"
         android:title="Quản lý người dùng"
         android:titleTextColor="@android:color/white" />
 

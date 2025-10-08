@@ -41,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="Đăng nhập"
+        android:backgroundTint="#00B4D8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,8 +81,4 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
-
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

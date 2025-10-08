@@ -13,7 +13,7 @@
         android:id="@+id/toolbarHocSinh"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="#00B4D8"
         android:title="Danh sách học sinh"
         android:titleTextColor="@color/black"
         app:navigationIcon="@drawable/ic_arrow_back" />
