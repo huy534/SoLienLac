@@ -19,7 +19,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 48; // tăng khi thay đổi cấu trúc
+    private static final int DB_VERSION = 49; 
     private Diem buildDiemFromCursor(Cursor c) {
         Diem d = new Diem(
                 c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
@@ -30,7 +30,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 c.getFloat(c.getColumnIndexOrThrow("diemTB")),
                 c.getString(c.getColumnIndexOrThrow("nhanXet"))
         );
-        // set hiển thị
         if (hasColumn(c, "tenHocSinh")) d.setTenHocSinh(c.getString(c.getColumnIndexOrThrow("tenHocSinh")));
         if (hasColumn(c, "tenMon")) d.setTenMon(c.getString(c.getColumnIndexOrThrow("tenMon")));
         if (hasColumn(c, "tenLop")) d.setTenLop(c.getString(c.getColumnIndexOrThrow("tenLop")));
@@ -202,28 +201,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private void seedData(SQLiteDatabase db) {
         // ---------- USERS ----------
-        safeInsertUser(db, "admin", "123", "admin", "admin@school.com", "0900000001");
+        safeInsertUser(db, "admin", "123", "admin", "admin@gmail.com", "0900000001");
 
         // 9 giáo viên
-        String[] gvNames = {"gvtoan", "gvvan", "gvanh", "gvly", "gvhoa", "gvsinh", "gvtin", "gvls", "gvdia"};
+        String[] gvNames = {"gvtoan1", "gvvan1", "gvanh1", "gvly1", "gvhoa1", "gvsinh1", "gvtin1", "gvls1", "gvdia1"};
         for (int i = 0; i < gvNames.length; i++) {
-            safeInsertUser(db, gvNames[i], "123", "giaovien", gvNames[i] + "@school.com", "09100000" + (i + 1));
+            safeInsertUser(db, gvNames[i], "123", "giaovien", gvNames[i] + "@gmail.com", "09100000" + (i + 1));
         }
 
         // 50 phụ huynh
         for (int i = 1; i <= 50; i++) {
-            safeInsertUser(db, "ph" + i, "123", "phuhuynh", "ph" + i + "@school.com", "09200000" + i);
+            safeInsertUser(db, "ph" + i, "123", "phuhuynh", "ph" + i + "@gmail.com", "09200000" + i);
         }
         // Lấy id GV
-        int idGvToan = getUserIdByUsername(db, "gvtoan");
-        int idGvVan = getUserIdByUsername(db, "gvvan");
-        int idGvAnh = getUserIdByUsername(db, "gvanh");
-        int idGvLy = getUserIdByUsername(db, "gvly");
-        int idGvHoa = getUserIdByUsername(db, "gvhoa");
-        int idGvSinh = getUserIdByUsername(db, "gvsinh");
-        int idGvTin = getUserIdByUsername(db, "gvtin");
-        int idGvLs = getUserIdByUsername(db, "gvls");
-        int idGvDia = getUserIdByUsername(db, "gvdia");
+        int idGvToan = getUserIdByUsername(db, "gvtoan1");
+        int idGvVan = getUserIdByUsername(db, "gvvan1");
+        int idGvAnh = getUserIdByUsername(db, "gvanh1");
+        int idGvLy = getUserIdByUsername(db, "gvly1");
+        int idGvHoa = getUserIdByUsername(db, "gvhoa1");
+        int idGvSinh = getUserIdByUsername(db, "gvsinh1");
+        int idGvTin = getUserIdByUsername(db, "gvtin1");
+        int idGvLs = getUserIdByUsername(db, "gvls1");
+        int idGvDia = getUserIdByUsername(db, "gvdia1");
 
         // ---------- LOP HOC ----------
         String[] tenLop = {"10A1", "10A2", "10A3", "10A4", "11A1", "11A2", "11A3", "12A1", "12A2", "12A3"};
