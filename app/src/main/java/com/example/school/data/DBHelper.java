@@ -994,7 +994,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
-
     // Lấy học sinh theo giáo viên chủ nhiệm
     public List<HocSinh> getHocSinhByTeacher(int teacherUserId) {
         List<HocSinh> list = new ArrayList<>();
