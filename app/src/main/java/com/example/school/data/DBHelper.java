@@ -19,7 +19,7 @@ import java.util.Random;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";
     private static final String DB_NAME = "school.db";
-    private static final int DB_VERSION = 49; 
+    private static final int DB_VERSION = 50; 
     private Diem buildDiemFromCursor(Cursor c) {
         Diem d = new Diem(
                 c.getInt(c.getColumnIndexOrThrow("hocSinhId")),
@@ -237,33 +237,33 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // ---------- HOC SINH ----------
         String[][] hocSinhs = {
-                {"Nguyen Van A", "2008-01-05", "Nam", "Ha Noi", "1"},
-                {"Tran Thi B", "2008-02-14", "Nu", "Hai Phong", "1"},
-                {"Le Van C", "2008-03-22", "Nam", "Nam Dinh", "2"},
-                {"Pham Thi D", "2008-04-10", "Nu", "Ha Noi", "2"},
-                {"Hoang Van E", "2008-05-18", "Nam", "Thai Binh", "3"},
-                {"Do Thi F", "2008-06-21", "Nu", "Thanh Hoa", "3"},
-                {"Ngo Van G", "2008-07-12", "Nam", "Ha Nam", "4"},
-                {"Bui Thi H", "2008-08-15", "Nu", "Hai Duong", "4"},
-                {"Nguyen Van I", "2008-09-09", "Nam", "Ha Noi", "5"},
-                {"Tran Thi K", "2008-10-30", "Nu", "Nam Dinh", "5"},
-                {"Pham Van L", "2008-11-20", "Nam", "Hai Phong", "6"},
-                {"Le Thi M", "2008-12-25", "Nu", "Ha Noi", "6"},
-                {"Hoang Van N", "2009-01-15", "Nam", "Thanh Hoa", "7"},
-                {"Do Thi O", "2009-02-18", "Nu", "Nghe An", "7"},
-                {"Ngo Van P", "2009-03-12", "Nam", "Ha Tinh", "8"},
-                {"Bui Thi Q", "2009-04-22", "Nu", "Hai Duong", "8"},
-                {"Nguyen Van R", "2009-05-11", "Nam", "Ha Noi", "9"},
-                {"Tran Thi S", "2009-06-07", "Nu", "Nam Dinh", "9"},
-                {"Pham Van T", "2009-07-09", "Nam", "Hai Phong", "10"},
-                {"Le Thi U", "2009-08-19", "Nu", "Ha Noi", "10"},
-                {"Hoang Van V", "2009-09-14", "Nam", "Ha Nam", "1"},
-                {"Do Thi W", "2009-10-29", "Nu", "Thanh Hoa", "2"},
-                {"Ngo Van X", "2009-11-03", "Nam", "Nghe An", "3"},
-                {"Bui Thi Y", "2009-12-08", "Nu", "Ha Noi", "4"},
-                {"Nguyen Van Z", "2010-01-17", "Nam", "Hai Phong", "5"},
-                {"Tran Thi AA", "2010-02-23", "Nu", "Nam Dinh", "6"},
-                {"Pham Van BB", "2010-03-15", "Nam", "Ha Noi", "7"}
+                {"Nguyễn Văn A", "2008-01-05", "Nam", "Hà Nội", "1"},
+                {"Trần Thị B", "2008-02-14", "Nữ", "Hải Phòng", "1"},
+                {"Lê Văn C", "2008-03-22", "Nam", "Nam Định", "2"},
+                {"Phạm Thị D", "2008-04-10", "Nữ", "Hà Nội", "2"},
+                {"Hoàng Văn E", "2008-05-18", "Nam", "Thái Bình", "3"},
+                {"Đỗ Thị F", "2008-06-21", "Nữ", "Thanh Hóa", "3"},
+                {"Ngô Văn G", "2008-07-12", "Nam", "Ninh Bình", "4"},
+                {"Bùi Thị H", "2008-08-15", "Nữ", "Bắc Ninh", "4"},
+                {"Nguyễn Văn I", "2008-09-09", "Nam", "Hà Nội", "5"},
+                {"Trần Thị K", "2008-10-30", "Nữ", "Nam Định", "5"},
+                {"Phạm Văn L", "2008-11-20", "Nam", "Hải Phòng", "6"},
+                {"Lê Thị M", "2008-12-25", "Nữ", "Hà Nội", "6"},
+                {"Hoàng Văn N", "2009-01-15", "Nam", "Thanh Hóa", "7"},
+                {"Đỗ Thị O", "2009-02-18", "Nữ", "Quảng Trị", "7"},
+                {"Ngô Văn P", "2009-03-12", "Nam", "Hà Tĩnh", "8"},
+                {"Bùi Thị Q", "2009-04-22", "Nữ", "Bắc Ninh", "8"},
+                {"Nguyễn Văn R", "2009-05-11", "Nam", "Hà Nội", "9"},
+                {"Trần Thị S", "2009-06-07", "Nữ", "Nam Định", "9"},
+                {"Phạm Văn T", "2009-07-09", "Nam", "Hải Phòng", "10"},
+                {"Lê Thị U", "2009-08-19", "Nữ", "Hà Nội", "10"},
+                {"Hoàng Văn V", "2009-09-14", "Nam", "Ninh Bình", "1"},
+                {"Đỗ Thị W", "2009-10-29", "Nữ", "Thanh Hóa", "2"},
+                {"Ngô Văn X", "2009-11-03", "Nam", "Quảng Trị", "3"},
+                {"Bùi Thị Y", "2009-12-08", "Nữ", "Hà Nội", "4"},
+                {"Nguyễn Văn Z", "2010-01-17", "Nam", "Hải Phòng", "5"},
+                {"Trần Thị AA", "2010-02-23", "Nữ", "Nam Định", "6"},
+                {"Phạm Văn BB", "2010-03-15", "Nam", "Hà Nội", "7"}
         };
 
         for (String[] hs : hocSinhs) {
@@ -350,8 +350,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
             }
         }
-        String[] dates = {"2025-09-01", "2025-09-02", "2025-09-03"}; // danh sách ngày
-        int[] monIds = {1, 2, 3, 4, 5, 6}; // danh sách môn
+        String[] dates = {"2025-09-01", "2025-09-02", "2025-09-03"}; 
+        int[] monIds = {1, 2, 3, 4, 5, 6}; 
         int[] studentIds = new int[27];
         for (int i = 0; i < 27; i++) studentIds[i] = i + 1; // id học sinh từ 1 đến 27
 
@@ -978,17 +978,19 @@ public class DBHelper extends SQLiteOpenHelper {
         List<HocSinh> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT hs.* FROM HocSinh hs JOIN ParentStudent ps ON hs.id = ps.studentId WHERE ps.userId = ?", new String[]{String.valueOf(userId)});
-        while (c.moveToNext()) {
-            list.add(new HocSinh(
-                    c.getInt(c.getColumnIndexOrThrow("id")),
-                    c.getString(c.getColumnIndexOrThrow("hoTen")),
-                    c.getString(c.getColumnIndexOrThrow("ngaySinh")),
-                    c.getString(c.getColumnIndexOrThrow("gioiTinh")),
-                    c.getString(c.getColumnIndexOrThrow("queQuan")),
-                    c.getInt(c.getColumnIndexOrThrow("maLop"))
-            ));
+        if (c != null) {
+            while (c.moveToNext()) {
+                list.add(new HocSinh(
+                        c.getInt(c.getColumnIndexOrThrow("id")),
+                        c.getString(c.getColumnIndexOrThrow("hoTen")),
+                        c.getString(c.getColumnIndexOrThrow("ngaySinh")),
+                        c.getString(c.getColumnIndexOrThrow("gioiTinh")),
+                        c.getString(c.getColumnIndexOrThrow("queQuan")),
+                        c.getInt(c.getColumnIndexOrThrow("maLop"))
+                ));
+            }
+            c.close();
         }
-        c.close();
         db.close();
         return list;
     }
