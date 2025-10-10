@@ -978,19 +978,17 @@ public class DBHelper extends SQLiteOpenHelper {
         List<HocSinh> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT hs.* FROM HocSinh hs JOIN ParentStudent ps ON hs.id = ps.studentId WHERE ps.userId = ?", new String[]{String.valueOf(userId)});
-        if (c != null) {
-            while (c.moveToNext()) {
-                list.add(new HocSinh(
-                        c.getInt(c.getColumnIndexOrThrow("id")),
-                        c.getString(c.getColumnIndexOrThrow("hoTen")),
-                        c.getString(c.getColumnIndexOrThrow("ngaySinh")),
-                        c.getString(c.getColumnIndexOrThrow("gioiTinh")),
-                        c.getString(c.getColumnIndexOrThrow("queQuan")),
-                        c.getInt(c.getColumnIndexOrThrow("maLop"))
-                ));
-            }
-            c.close();
+        while (c.moveToNext()) {
+            list.add(new HocSinh(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("hoTen")),
+                    c.getString(c.getColumnIndexOrThrow("ngaySinh")),
+                    c.getString(c.getColumnIndexOrThrow("gioiTinh")),
+                    c.getString(c.getColumnIndexOrThrow("queQuan")),
+                    c.getInt(c.getColumnIndexOrThrow("maLop"))
+            ));
         }
+        c.close();
         db.close();
         return list;
     }
